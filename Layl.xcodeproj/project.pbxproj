@@ -1,0 +1,396 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00000000A110000000000016 /* LaylApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000015 /* LaylApp.swift */; };
+		00000000A110000000000019 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000018 /* Models.swift */; };
+		00000000A11000000000001B /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000001A /* Catalog.swift */; };
+		00000000A11000000000001D /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000001C /* AppModel.swift */; };
+		00000000A110000000000020 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000001F /* Theme.swift */; };
+		00000000A110000000000023 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000022 /* Components.swift */; };
+		00000000A110000000000025 /* ProfilePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000024 /* ProfilePickerView.swift */; };
+		00000000A110000000000027 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000026 /* HomeView.swift */; };
+		00000000A110000000000029 /* TitleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000028 /* TitleDetailView.swift */; };
+		00000000A11000000000002B /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002A /* PlayerView.swift */; };
+		00000000A11000000000002D /* LibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002C /* LibraryViews.swift */; };
+		00000000A11000000000002F /* MainShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002E /* MainShell.swift */; };
+		00000000A110000000000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000012 /* Assets.xcassets */; };
+		00000000A110000000000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000011 /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		00000000A110000000000015 /* LaylApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaylApp.swift; sourceTree = "<group>"; };
+		00000000A110000000000018 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		00000000A11000000000001A /* Catalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
+		00000000A11000000000001C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		00000000A11000000000001F /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		00000000A110000000000022 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		00000000A110000000000024 /* ProfilePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePickerView.swift; sourceTree = "<group>"; };
+		00000000A110000000000026 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		00000000A110000000000028 /* TitleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailView.swift; sourceTree = "<group>"; };
+		00000000A11000000000002A /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		00000000A11000000000002C /* LibraryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViews.swift; sourceTree = "<group>"; };
+		00000000A11000000000002E /* MainShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShell.swift; sourceTree = "<group>"; };
+		00000000A110000000000010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		00000000A110000000000011 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		00000000A110000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		00000000A110000000000009 /* Layl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Layl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		00000000A110000000000003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00000000A110000000000006 = {
+			isa = PBXGroup;
+			children = (
+				00000000A110000000000007 /* Layl */,
+				00000000A110000000000008 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		00000000A110000000000008 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				00000000A110000000000009 /* Layl.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		00000000A110000000000007 /* Layl */ = {
+			isa = PBXGroup;
+			children = (
+				00000000A110000000000015 /* LaylApp.swift */,
+				00000000A11000000000001E /* Model */,
+				00000000A110000000000021 /* Design */,
+				00000000A110000000000030 /* Views */,
+				00000000A110000000000012 /* Assets.xcassets */,
+				00000000A110000000000010 /* Info.plist */,
+				00000000A110000000000011 /* PrivacyInfo.xcprivacy */,
+			);
+			path = Layl;
+			sourceTree = "<group>";
+		};
+		00000000A11000000000001E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				00000000A110000000000018 /* Models.swift */,
+				00000000A11000000000001A /* Catalog.swift */,
+				00000000A11000000000001C /* AppModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		00000000A110000000000021 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				00000000A11000000000001F /* Theme.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		00000000A110000000000030 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				00000000A110000000000022 /* Components.swift */,
+				00000000A110000000000024 /* ProfilePickerView.swift */,
+				00000000A110000000000026 /* HomeView.swift */,
+				00000000A110000000000028 /* TitleDetailView.swift */,
+				00000000A11000000000002A /* PlayerView.swift */,
+				00000000A11000000000002C /* LibraryViews.swift */,
+				00000000A11000000000002E /* MainShell.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		00000000A110000000000004 /* Layl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 00000000A11000000000000A /* Build configuration list for PBXNativeTarget "Layl" */;
+			buildPhases = (
+				00000000A110000000000001 /* Sources */,
+				00000000A110000000000003 /* Frameworks */,
+				00000000A110000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Layl;
+			productName = Layl;
+			productReference = 00000000A110000000000009 /* Layl.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		00000000A110000000000005 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					00000000A110000000000004 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 00000000A11000000000000B /* Build configuration list for PBXProject "Layl" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = ar;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				ar,
+				en,
+				Base,
+			);
+			mainGroup = 00000000A110000000000006;
+			productRefGroup = 00000000A110000000000008 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				00000000A110000000000004 /* Layl */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		00000000A110000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00000000A110000000000014 /* Assets.xcassets in Resources */,
+				00000000A110000000000013 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		00000000A110000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00000000A110000000000016 /* LaylApp.swift in Sources */,
+				00000000A110000000000019 /* Models.swift in Sources */,
+				00000000A11000000000001B /* Catalog.swift in Sources */,
+				00000000A11000000000001D /* AppModel.swift in Sources */,
+				00000000A110000000000020 /* Theme.swift in Sources */,
+				00000000A110000000000023 /* Components.swift in Sources */,
+				00000000A110000000000025 /* ProfilePickerView.swift in Sources */,
+				00000000A110000000000027 /* HomeView.swift in Sources */,
+				00000000A110000000000029 /* TitleDetailView.swift in Sources */,
+				00000000A11000000000002B /* PlayerView.swift in Sources */,
+				00000000A11000000000002D /* LibraryViews.swift in Sources */,
+				00000000A11000000000002F /* MainShell.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		00000000A11000000000000C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		00000000A11000000000000D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		00000000A11000000000000E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Layl/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.layl.streaming;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+
+			};
+			name = Debug;
+		};
+		00000000A11000000000000F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Layl/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.layl.streaming;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		00000000A11000000000000B /* Build configuration list for PBXProject "Layl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000A11000000000000C /* Debug */,
+				00000000A11000000000000D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00000000A11000000000000A /* Build configuration list for PBXNativeTarget "Layl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000A11000000000000E /* Debug */,
+				00000000A11000000000000F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 00000000A110000000000005 /* Project object */;
+}

@@ -1,0 +1,9 @@
+{
+  "images" : [
+    {
+      "filename" : "backdrop_bbb.jpg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : { "author" : "xcode", "version" : 1 }
+}
