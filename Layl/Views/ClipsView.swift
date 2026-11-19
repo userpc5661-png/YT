@@ -73,7 +73,7 @@ struct ClipsView: View {
             .padding(20)
             .padding(.bottom, 24)
         }
+        .frame(maxWidth: .infinity)
         .frame(height: max(height, 480))
-        .containerRelativeFrame(.vertical)
     }
 }

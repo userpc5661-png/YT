@@ -149,6 +149,7 @@ struct MainShell: View {
                             Text(item.title(model.language))
                                 .font(.caption2.weight(section == item ? .bold : .medium))
                                 .lineLimit(1)
+                                .minimumScaleFactor(0.7)
                         }
                         .foregroundStyle(section == item ? Color.white : Color.white.opacity(0.55))
                         .frame(maxWidth: .infinity)

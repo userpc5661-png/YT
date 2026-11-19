@@ -15,24 +15,25 @@
 		00000000A110000000000021 /* ContentSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000020 /* ContentSource.swift */; };
 		00000000A110000000000024 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000023 /* Theme.swift */; };
 		00000000A110000000000026 /* LayoutMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000025 /* LayoutMetrics.swift */; };
-		00000000A110000000000029 /* StreamingAvailabilityAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000028 /* StreamingAvailabilityAPI.swift */; };
-		00000000A11000000000002B /* JSONPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002A /* JSONPath.swift */; };
-		00000000A11000000000002D /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002C /* KeychainStore.swift */; };
-		00000000A11000000000002F /* SourceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002E /* SourceClient.swift */; };
-		00000000A110000000000032 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000031 /* Components.swift */; };
-		00000000A110000000000034 /* ProfilePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000033 /* ProfilePickerView.swift */; };
-		00000000A110000000000036 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000035 /* HomeView.swift */; };
-		00000000A110000000000038 /* TitleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000037 /* TitleDetailView.swift */; };
-		00000000A11000000000003A /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000039 /* PlayerView.swift */; };
-		00000000A11000000000003C /* LibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003B /* LibraryViews.swift */; };
-		00000000A11000000000003E /* MainShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003D /* MainShell.swift */; };
-		00000000A110000000000040 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003F /* DiscoverView.swift */; };
-		00000000A110000000000042 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000041 /* SettingsView.swift */; };
-		00000000A110000000000044 /* StreamingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000043 /* StreamingViews.swift */; };
-		00000000A110000000000046 /* RemotePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000045 /* RemotePlayerView.swift */; };
-		00000000A110000000000048 /* SourceViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000047 /* SourceViews.swift */; };
-		00000000A11000000000004A /* LayoutPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000049 /* LayoutPreview.swift */; };
-		00000000A11000000000004C /* ClipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004B /* ClipsView.swift */; };
+		00000000A110000000000028 /* Glass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000027 /* Glass.swift */; };
+		00000000A11000000000002B /* StreamingAvailabilityAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002A /* StreamingAvailabilityAPI.swift */; };
+		00000000A11000000000002D /* JSONPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002C /* JSONPath.swift */; };
+		00000000A11000000000002F /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002E /* KeychainStore.swift */; };
+		00000000A110000000000031 /* SourceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000030 /* SourceClient.swift */; };
+		00000000A110000000000034 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000033 /* Components.swift */; };
+		00000000A110000000000036 /* ProfilePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000035 /* ProfilePickerView.swift */; };
+		00000000A110000000000038 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000037 /* HomeView.swift */; };
+		00000000A11000000000003A /* TitleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000039 /* TitleDetailView.swift */; };
+		00000000A11000000000003C /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003B /* PlayerView.swift */; };
+		00000000A11000000000003E /* LibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003D /* LibraryViews.swift */; };
+		00000000A110000000000040 /* MainShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003F /* MainShell.swift */; };
+		00000000A110000000000042 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000041 /* DiscoverView.swift */; };
+		00000000A110000000000044 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000043 /* SettingsView.swift */; };
+		00000000A110000000000046 /* StreamingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000045 /* StreamingViews.swift */; };
+		00000000A110000000000048 /* RemotePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000047 /* RemotePlayerView.swift */; };
+		00000000A11000000000004A /* SourceViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000049 /* SourceViews.swift */; };
+		00000000A11000000000004C /* LayoutPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004B /* LayoutPreview.swift */; };
+		00000000A11000000000004E /* ClipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004D /* ClipsView.swift */; };
 		00000000A110000000000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000012 /* Assets.xcassets */; };
 		00000000A110000000000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000011 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -46,24 +47,25 @@
 		00000000A110000000000020 /* ContentSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentSource.swift; sourceTree = "<group>"; };
 		00000000A110000000000023 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		00000000A110000000000025 /* LayoutMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutMetrics.swift; sourceTree = "<group>"; };
-		00000000A110000000000028 /* StreamingAvailabilityAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingAvailabilityAPI.swift; sourceTree = "<group>"; };
-		00000000A11000000000002A /* JSONPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONPath.swift; sourceTree = "<group>"; };
-		00000000A11000000000002C /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
-		00000000A11000000000002E /* SourceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceClient.swift; sourceTree = "<group>"; };
-		00000000A110000000000031 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
-		00000000A110000000000033 /* ProfilePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePickerView.swift; sourceTree = "<group>"; };
-		00000000A110000000000035 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		00000000A110000000000037 /* TitleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailView.swift; sourceTree = "<group>"; };
-		00000000A110000000000039 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
-		00000000A11000000000003B /* LibraryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViews.swift; sourceTree = "<group>"; };
-		00000000A11000000000003D /* MainShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShell.swift; sourceTree = "<group>"; };
-		00000000A11000000000003F /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
-		00000000A110000000000041 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		00000000A110000000000043 /* StreamingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingViews.swift; sourceTree = "<group>"; };
-		00000000A110000000000045 /* RemotePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePlayerView.swift; sourceTree = "<group>"; };
-		00000000A110000000000047 /* SourceViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViews.swift; sourceTree = "<group>"; };
-		00000000A110000000000049 /* LayoutPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutPreview.swift; sourceTree = "<group>"; };
-		00000000A11000000000004B /* ClipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsView.swift; sourceTree = "<group>"; };
+		00000000A110000000000027 /* Glass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Glass.swift; sourceTree = "<group>"; };
+		00000000A11000000000002A /* StreamingAvailabilityAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingAvailabilityAPI.swift; sourceTree = "<group>"; };
+		00000000A11000000000002C /* JSONPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONPath.swift; sourceTree = "<group>"; };
+		00000000A11000000000002E /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		00000000A110000000000030 /* SourceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceClient.swift; sourceTree = "<group>"; };
+		00000000A110000000000033 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		00000000A110000000000035 /* ProfilePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePickerView.swift; sourceTree = "<group>"; };
+		00000000A110000000000037 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		00000000A110000000000039 /* TitleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailView.swift; sourceTree = "<group>"; };
+		00000000A11000000000003B /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		00000000A11000000000003D /* LibraryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViews.swift; sourceTree = "<group>"; };
+		00000000A11000000000003F /* MainShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShell.swift; sourceTree = "<group>"; };
+		00000000A110000000000041 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		00000000A110000000000043 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		00000000A110000000000045 /* StreamingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingViews.swift; sourceTree = "<group>"; };
+		00000000A110000000000047 /* RemotePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePlayerView.swift; sourceTree = "<group>"; };
+		00000000A110000000000049 /* SourceViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViews.swift; sourceTree = "<group>"; };
+		00000000A11000000000004B /* LayoutPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutPreview.swift; sourceTree = "<group>"; };
+		00000000A11000000000004D /* ClipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsView.swift; sourceTree = "<group>"; };
 		00000000A110000000000010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00000000A110000000000011 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		00000000A110000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -102,9 +104,9 @@
 			children = (
 				00000000A110000000000015 /* LaylApp.swift */,
 				00000000A110000000000022 /* Model */,
-				00000000A110000000000027 /* Design */,
-				00000000A110000000000030 /* Services */,
-				00000000A11000000000004D /* Views */,
+				00000000A110000000000029 /* Design */,
+				00000000A110000000000032 /* Services */,
+				00000000A11000000000004F /* Views */,
 				00000000A110000000000012 /* Assets.xcassets */,
 				00000000A110000000000010 /* Info.plist */,
 				00000000A110000000000011 /* PrivacyInfo.xcprivacy */,
@@ -124,43 +126,44 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		00000000A110000000000027 /* Design */ = {
+		00000000A110000000000029 /* Design */ = {
 			isa = PBXGroup;
 			children = (
 				00000000A110000000000023 /* Theme.swift */,
 				00000000A110000000000025 /* LayoutMetrics.swift */,
+				00000000A110000000000027 /* Glass.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
 		};
-		00000000A110000000000030 /* Services */ = {
+		00000000A110000000000032 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				00000000A110000000000028 /* StreamingAvailabilityAPI.swift */,
-				00000000A11000000000002A /* JSONPath.swift */,
-				00000000A11000000000002C /* KeychainStore.swift */,
-				00000000A11000000000002E /* SourceClient.swift */,
+				00000000A11000000000002A /* StreamingAvailabilityAPI.swift */,
+				00000000A11000000000002C /* JSONPath.swift */,
+				00000000A11000000000002E /* KeychainStore.swift */,
+				00000000A110000000000030 /* SourceClient.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		00000000A11000000000004D /* Views */ = {
+		00000000A11000000000004F /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				00000000A110000000000031 /* Components.swift */,
-				00000000A110000000000033 /* ProfilePickerView.swift */,
-				00000000A110000000000035 /* HomeView.swift */,
-				00000000A110000000000037 /* TitleDetailView.swift */,
-				00000000A110000000000039 /* PlayerView.swift */,
-				00000000A11000000000003B /* LibraryViews.swift */,
-				00000000A11000000000003D /* MainShell.swift */,
-				00000000A11000000000003F /* DiscoverView.swift */,
-				00000000A110000000000041 /* SettingsView.swift */,
-				00000000A110000000000043 /* StreamingViews.swift */,
-				00000000A110000000000045 /* RemotePlayerView.swift */,
-				00000000A110000000000047 /* SourceViews.swift */,
-				00000000A110000000000049 /* LayoutPreview.swift */,
-				00000000A11000000000004B /* ClipsView.swift */,
+				00000000A110000000000033 /* Components.swift */,
+				00000000A110000000000035 /* ProfilePickerView.swift */,
+				00000000A110000000000037 /* HomeView.swift */,
+				00000000A110000000000039 /* TitleDetailView.swift */,
+				00000000A11000000000003B /* PlayerView.swift */,
+				00000000A11000000000003D /* LibraryViews.swift */,
+				00000000A11000000000003F /* MainShell.swift */,
+				00000000A110000000000041 /* DiscoverView.swift */,
+				00000000A110000000000043 /* SettingsView.swift */,
+				00000000A110000000000045 /* StreamingViews.swift */,
+				00000000A110000000000047 /* RemotePlayerView.swift */,
+				00000000A110000000000049 /* SourceViews.swift */,
+				00000000A11000000000004B /* LayoutPreview.swift */,
+				00000000A11000000000004D /* ClipsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -244,24 +247,25 @@
 				00000000A110000000000021 /* ContentSource.swift in Sources */,
 				00000000A110000000000024 /* Theme.swift in Sources */,
 				00000000A110000000000026 /* LayoutMetrics.swift in Sources */,
-				00000000A110000000000029 /* StreamingAvailabilityAPI.swift in Sources */,
-				00000000A11000000000002B /* JSONPath.swift in Sources */,
-				00000000A11000000000002D /* KeychainStore.swift in Sources */,
-				00000000A11000000000002F /* SourceClient.swift in Sources */,
-				00000000A110000000000032 /* Components.swift in Sources */,
-				00000000A110000000000034 /* ProfilePickerView.swift in Sources */,
-				00000000A110000000000036 /* HomeView.swift in Sources */,
-				00000000A110000000000038 /* TitleDetailView.swift in Sources */,
-				00000000A11000000000003A /* PlayerView.swift in Sources */,
-				00000000A11000000000003C /* LibraryViews.swift in Sources */,
-				00000000A11000000000003E /* MainShell.swift in Sources */,
-				00000000A110000000000040 /* DiscoverView.swift in Sources */,
-				00000000A110000000000042 /* SettingsView.swift in Sources */,
-				00000000A110000000000044 /* StreamingViews.swift in Sources */,
-				00000000A110000000000046 /* RemotePlayerView.swift in Sources */,
-				00000000A110000000000048 /* SourceViews.swift in Sources */,
-				00000000A11000000000004A /* LayoutPreview.swift in Sources */,
-				00000000A11000000000004C /* ClipsView.swift in Sources */,
+				00000000A110000000000028 /* Glass.swift in Sources */,
+				00000000A11000000000002B /* StreamingAvailabilityAPI.swift in Sources */,
+				00000000A11000000000002D /* JSONPath.swift in Sources */,
+				00000000A11000000000002F /* KeychainStore.swift in Sources */,
+				00000000A110000000000031 /* SourceClient.swift in Sources */,
+				00000000A110000000000034 /* Components.swift in Sources */,
+				00000000A110000000000036 /* ProfilePickerView.swift in Sources */,
+				00000000A110000000000038 /* HomeView.swift in Sources */,
+				00000000A11000000000003A /* TitleDetailView.swift in Sources */,
+				00000000A11000000000003C /* PlayerView.swift in Sources */,
+				00000000A11000000000003E /* LibraryViews.swift in Sources */,
+				00000000A110000000000040 /* MainShell.swift in Sources */,
+				00000000A110000000000042 /* DiscoverView.swift in Sources */,
+				00000000A110000000000044 /* SettingsView.swift in Sources */,
+				00000000A110000000000046 /* StreamingViews.swift in Sources */,
+				00000000A110000000000048 /* RemotePlayerView.swift in Sources */,
+				00000000A11000000000004A /* SourceViews.swift in Sources */,
+				00000000A11000000000004C /* LayoutPreview.swift in Sources */,
+				00000000A11000000000004E /* ClipsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

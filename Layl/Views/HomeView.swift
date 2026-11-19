@@ -30,11 +30,15 @@ struct HomeView: View {
                 }
                 if chip == .series {
                     seriesRail
+                } else if chip == .movies {
+                    moviesRail
                 } else if chip == .fresh {
                     newestRail
                 } else if let homeGenre {
                     genreRail(homeGenre)
                 } else {
+                    onlyOnRail
+                    newestRail
                     ForEach(Catalog.homeLanes(kidsOnly: model.kidsOnly)) { lane in
                         MediaRail(lane: lane, posterWidth: layout.posterWidth)
                     }
@@ -84,8 +88,15 @@ struct HomeView: View {
         }
     }
 
+    private var ambientAsset: String {
+        let featured = filteredFeatured
+        guard !featured.isEmpty else { return "backdrop_sintel" }
+        let index = min(max(featuredIndex, 0), featured.count - 1)
+        return featured[index].backdropAsset
+    }
+
     private var ambient: some View {
-        let asset = filteredFeatured.first?.backdropAsset ?? "backdrop_sintel"
+        let asset = ambientAsset
         let tone = ArtworkTone.color(asset: asset)
         return ZStack {
             tone.ignoresSafeArea()
@@ -103,7 +114,12 @@ struct HomeView: View {
     private var topBar: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
-                BrandLockup(mark: 26)
+                Image("BrandMark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 28, height: 28)
+                    .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    .accessibilityLabel("Layl")
                 Text(model.language.t("الرئيسية", "Home"))
                     .font(.title3.weight(.bold))
                 Spacer(minLength: 8)
@@ -203,6 +219,22 @@ struct HomeView: View {
         let ids = Catalog.all.filter { $0.kind == .series && model.isVisible($0) }.map(\.id)
         return MediaRail(
             lane: Lane(id: "series-home", title: L10n(ar: "مسلسلات", en: "Series"), titleIDs: ids, style: .poster),
+            posterWidth: layout.posterWidth
+        )
+    }
+
+    private var moviesRail: some View {
+        let ids = Catalog.all.filter { $0.kind == .movie && model.isVisible($0) }.map(\.id)
+        return MediaRail(
+            lane: Lane(id: "movies-home", title: L10n(ar: "أفلام", en: "Films"), titleIDs: ids, style: .poster),
+            posterWidth: layout.posterWidth
+        )
+    }
+
+    private var onlyOnRail: some View {
+        let ids = Catalog.all.filter(model.isVisible).prefix(14).map(\.id)
+        return MediaRail(
+            lane: Lane(id: "only-on-layl", title: L10n(ar: "حصريًا على ليل", en: "Only on Layl"), titleIDs: Array(ids), style: .poster),
             posterWidth: layout.posterWidth
         )
     }
