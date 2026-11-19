@@ -58,10 +58,6 @@ struct MainShell: View {
                 .background(Color.black)
             }
         }
-        .environment(
-            \.laylLayout,
-            LaylLayoutMetrics.current(horizontalSizeClass: sizeClass, density: model.contentDensity)
-        )
         .fullScreenCover(
             item: Binding(
                 get: { model.playRequest },
