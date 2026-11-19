@@ -272,7 +272,7 @@ struct LicensesView: View {
 
     var body: some View {
         List {
-            Section {
+            SwiftUI.Section {
                 Text(model.language.t(
                     "ليل يعرض أفلامًا مفتوحة من مؤسسة بلندر وأفلامًا كلاسيكية في الملك العام. لا نملك هذه الأعمال، ونعرضها مع ذكر المصدر والترخيص. التشغيل يتم مباشرة من أرشيف الإنترنت.",
                     "Layl plays Blender Foundation open movies and public-domain classics. We do not own these films. Each title is shown with its source and license, and streams directly from the Internet Archive."
@@ -281,7 +281,7 @@ struct LicensesView: View {
                 .foregroundStyle(.secondary)
                 .listRowBackground(LaylTheme.elevated)
             }
-            Section(model.language.t("الأعمال", "Titles")) {
+            SwiftUI.Section(model.language.t("الأعمال", "Titles")) {
                 ForEach(Catalog.all) { title in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(title.title.text(model.language))
