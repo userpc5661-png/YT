@@ -1,5 +1,10 @@
 import SwiftUI
 
+enum DetailPane: String, CaseIterable, Identifiable {
+    case episodes, collection, similar, trailers
+    var id: String { rawValue }
+}
+
 struct TitleDetailView: View {
     let title: CatalogTitle
 
@@ -7,114 +12,255 @@ struct TitleDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.laylLayout) private var layout
     @Environment(\.openURL) private var openURL
+    @State private var pane: DetailPane = .episodes
+    @State private var expanded = false
+    @State private var showRate = false
+    @State private var season = 1
 
     var body: some View {
         let language = model.language
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 16) {
                 header
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack(spacing: 8) {
-                        Text("\(title.match)%")
-                            .foregroundStyle(LaylTheme.match)
-                            .fontWeight(.bold)
-                        Text(language.t("مناسب لك", "Match"))
-                            .foregroundStyle(LaylTheme.match)
-                        Text(String(format: "%.1f", title.score))
-                            .foregroundStyle(.white.opacity(0.8))
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("ليل")
+                        .font(.caption.weight(.heavy))
+                        .tracking(1.2)
+                        .foregroundStyle(LaylTheme.red)
+                    Text(title.title.text(language))
+                        .font(.system(size: layout.detailTitleSize, weight: .bold))
+                        .minimumScaleFactor(0.7)
+                    metaRow
+                    Text(title.credit.text(language))
+                        .font(.subheadline.weight(.semibold))
+                    Button { model.play(title: title) } label: {
+                        Label(playLabel, systemImage: "play.fill")
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(.white, in: RoundedRectangle(cornerRadius: 8))
                     }
-                    .font(.subheadline)
-
-                    HStack(spacing: 12) {
-                        PlayPill(title: playLabel) { model.play(title: title) }
-                        RoundIconButton(systemName: model.isSaved(title.id) ? "checkmark" : "plus", filled: model.isSaved(title.id)) {
-                            model.toggleSaved(title.id)
+                    .buttonStyle(.plain)
+                    Button { model.toggleDownload(title.id) } label: {
+                        Label(
+                            model.isDownloaded(title.id) ? language.t("محفوظ على الجهاز", "Saved on this device") : language.t("تنزيل", "Download"),
+                            systemImage: "arrow.down.to.line"
+                        )
+                        .font(.headline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 8))
+                    }
+                    .buttonStyle(.plain)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title.synopsis.text(language))
+                            .font(.subheadline)
+                            .lineLimit(expanded ? nil : 3)
+                        Button(expanded ? language.t("أقل", "Less") : language.t("المزيد", "More")) {
+                            expanded.toggle()
                         }
-                        .accessibilityLabel(language.t("قائمتي", "My List"))
+                        .font(.caption.weight(.bold))
                     }
-
-                    Text(title.synopsis.text(language))
-                        .font(.body)
-                        .foregroundStyle(.white.opacity(0.92))
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(title.genres.map { $0.title(language) }.joined(separator: language.t(" · ", " · ")))
-                        .font(.subheadline)
-                        .foregroundStyle(LaylTheme.muted)
-
-                    labeled(language.t("بطولة وإنتاج", "Credits"), title.credit.text(language))
-                    if !title.cast.isEmpty {
-                        labeled(
-                            language.t("التمثيل", "Cast"),
-                            title.cast.map { $0.text(language) }.joined(separator: language.t("، ", ", "))
-                        )
-                    }
-                    if let quality = qualityNote {
-                        Text(quality)
-                            .font(.footnote)
-                            .foregroundStyle(LaylTheme.muted)
-                    }
-
-                    if title.kind == .series {
-                        episodes
-                    }
-
-                    let related = Catalog.related(to: title, kidsOnly: model.kidsOnly)
-                    if !related.isEmpty {
-                        MediaRail(
-                            lane: Lane(
-                                id: "related-\(title.id)",
-                                title: L10n(ar: "عناوين مشابهة", en: "More like this"),
-                                titleIDs: related.map(\.id),
-                                style: .poster
-                            ),
-                            posterWidth: layout.posterWidth
-                        )
-                        .padding(.horizontal, -layout.contentInset)
-                    }
-
-                    if model.hasStreamingAPI {
-                        streamingAvailability
-                    }
-
+                    actionRow
+                    panePicker
+                    paneBody
+                    if model.hasStreamingAPI { streamingAvailability }
                     rights
                 }
                 .padding(.horizontal, layout.contentInset)
-                .padding(.bottom, 32)
+                .padding(.bottom, 28)
             }
         }
-        .laylScreen()
+        .background(Color.black.opacity(0.92))
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden(true)
         .onAppear { model.loadStreamingInfo(for: title) }
+        .popover(isPresented: $showRate) {
+            ratePopover
+                .presentationCompactAdaptation(.popover)
+        }
+    }
+
+    private var metaRow: some View {
+        let language = model.language
+        let seasons = Set(title.episodes.map(\.season)).count
+        return HStack(spacing: 8) {
+            Text(String(title.year))
+            Text(title.maturity.text(language))
+                .font(.caption2.weight(.bold))
+                .padding(.horizontal, 4)
+                .overlay(RoundedRectangle(cornerRadius: 2).stroke(.white.opacity(0.7)))
+            if title.kind == .series {
+                Text(language.t("\(seasons) مواسم", "\(seasons) seasons"))
+            }
+            Text(title.quality == .hd ? "HD" : "SD")
+                .font(.caption2.weight(.bold))
+                .padding(.horizontal, 4)
+                .overlay(RoundedRectangle(cornerRadius: 2).stroke(.white.opacity(0.7)))
+        }
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(.white.opacity(0.85))
+    }
+
+    private var actionRow: some View {
+        let language = model.language
+        return HStack {
+            actionButton(language.t("قائمتي", "My List"), model.isSaved(title.id) ? "checkmark" : "plus") {
+                model.toggleSaved(title.id)
+            }
+            actionButton(language.t("تقييم", "Rate"), "hand.thumbsup") { showRate = true }
+            ShareLink(item: title.title.text(language)) {
+                VStack(spacing: 4) {
+                    Image(systemName: "square.and.arrow.up")
+                    Text(language.t("مشاركة", "Share")).font(.caption2)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.plain)
+            actionButton(language.t("تنزيل الموسم", "Download season"), "arrow.down.to.line") {
+                model.toggleDownload(title.id)
+            }
+        }
+        .foregroundStyle(.white)
+    }
+
+    private func actionButton(_ title: String, _ symbol: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: symbol)
+                Text(title).font(.caption2).lineLimit(1).minimumScaleFactor(0.7)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var ratePopover: some View {
+        let language = model.language
+        return HStack(spacing: 16) {
+            rateChoice("hand.thumbsdown", language.t("ليس لي", "Not for me"), "skip")
+            rateChoice("hand.thumbsup", language.t("أعجبني", "I like this"), "like")
+            rateChoice("heart.fill", language.t("أحببته", "Love this!"), "love")
+        }
+        .padding(16)
+        .laylGlass(in: Capsule(), interactive: true)
+        .presentationBackground(.clear)
+    }
+
+    private func rateChoice(_ symbol: String, _ label: String, _ value: String) -> some View {
+        Button {
+            model.setTaste(value, for: title.id)
+            showRate = false
+        } label: {
+            VStack(spacing: 6) {
+                Image(systemName: symbol).font(.title3)
+                Text(label).font(.caption2).multilineTextAlignment(.center)
+            }
+            .frame(width: 72)
+            .foregroundStyle(model.taste(for: title.id) == value ? LaylTheme.red : .white)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var panePicker: some View {
+        let language = model.language
+        return ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 16) {
+                ForEach(DetailPane.allCases) { item in
+                    Button(paneTitle(item, language)) { pane = item }
+                        .font(.subheadline.weight(pane == item ? .bold : .regular))
+                        .foregroundStyle(pane == item ? .white : .white.opacity(0.55))
+                        .padding(.bottom, 6)
+                        .overlay(alignment: .bottom) {
+                            if pane == item { Rectangle().fill(LaylTheme.red).frame(height: 2) }
+                        }
+                }
+            }
+        }
+    }
+
+    private func paneTitle(_ pane: DetailPane, _ language: AppLanguage) -> String {
+        switch pane {
+        case .episodes: return language.t("الحلقات", "Episodes")
+        case .collection: return language.t("المجموعة", "Collection")
+        case .similar: return language.t("عناوين مشابهة", "More like this")
+        case .trailers: return language.t("مقتطفات", "Trailers")
+        }
+    }
+
+    @ViewBuilder
+    private var paneBody: some View {
+        switch pane {
+        case .episodes:
+            seasonMenu
+            ForEach(title.episodes.filter { $0.season == season }) { episode in
+                episodeRow(episode)
+            }
+        case .collection, .similar:
+            let related = Catalog.related(to: title, kidsOnly: model.kidsOnly)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: layout.gridMinWidth), spacing: 10)], spacing: 12) {
+                ForEach(related) { item in
+                    Button { model.detailTitle = item } label: {
+                        PosterCard(title: item, width: layout.gridMinWidth)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        case .trailers:
+            ForEach(title.episodes) { episode in
+                Button { model.play(title: title, episode: episode) } label: {
+                    ZStack {
+                        CatalogImage(asset: episode.stillAsset).frame(height: 160).clipped()
+                        Image(systemName: "play.fill").font(.title).padding(16).background(.black.opacity(0.45), in: Circle())
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var seasonMenu: some View {
+        let seasons = Array(Set(title.episodes.map(\.season))).sorted()
+        return Menu {
+            ForEach(seasons, id: \.self) { item in
+                Button(model.language.t("الموسم \(item)", "Season \(item)")) { season = item }
+            }
+        } label: {
+            HStack {
+                Text(model.language.t("الموسم \(season)", "Season \(season)"))
+                Image(systemName: "chevron.down")
+            }
+            .font(.subheadline.weight(.semibold))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .laylGlassCapsule()
+        }
     }
 
     private var header: some View {
-        ZStack(alignment: .bottomLeading) {
+        ZStack(alignment: .top) {
             CatalogImage(asset: title.backdropAsset)
-                .frame(height: layout.heroHeight * 0.72)
+                .frame(height: min(layout.heroHeight * 0.55, 280))
                 .frame(maxWidth: .infinity)
                 .clipped()
-            LinearGradient(colors: [.clear, LaylTheme.bg], startPoint: .center, endPoint: .bottom)
-            VStack(alignment: .leading, spacing: 8) {
-                Text(title.title.text(model.language))
-                    .font(.system(size: layout.detailTitleSize, weight: .heavy))
-                    .lineLimit(3)
-                MetaPills(title: title)
+            HStack {
+                Button { model.play(title: title) } label: {
+                    Image(systemName: "airplayvideo")
+                        .frame(width: 36, height: 36)
+                        .laylGlassCircle()
+                }
+                .buttonStyle(.plain)
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.body.weight(.bold))
+                        .frame(width: 36, height: 36)
+                        .laylGlassCircle()
+                }
+                .buttonStyle(.plain)
             }
-            .padding(.horizontal, layout.contentInset)
-            .padding(.bottom, 12)
-        }
-        .overlay(alignment: .topLeading) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: model.language == .arabic ? "chevron.right" : "chevron.left")
-                    .font(.body.weight(.bold))
-                    .frame(width: 40, height: 40)
-                    .background(.black.opacity(0.55), in: Circle())
-            }
-            .buttonStyle(.plain)
             .padding(.horizontal, layout.contentInset)
             .padding(.top, 12)
         }

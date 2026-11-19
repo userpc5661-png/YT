@@ -27,6 +27,11 @@ final class AppModel {
     var sourceSearch: [RemoteTitle] = []
     var sourcesLoading = false
     var remotePlay: RemotePlayback?
+    var detailTitle: CatalogTitle?
+    var detailRemote: RemoteTitle?
+    var detailShow: StreamingShow?
+    var tastes: [String: String] = [:]
+    var downloads: [String] = []
 
     private var lists: [String: [String]]
     private var progress: [String: [String: WatchProgress]]
@@ -75,6 +80,34 @@ final class AppModel {
             preferredStreamingServices = Set(StreamingServiceChip.featured.map(\.id))
         }
         loadSources()
+        tastes = UserDefaults.standard.dictionary(forKey: "layl.tastes.v1") as? [String: String] ?? [:]
+        downloads = UserDefaults.standard.stringArray(forKey: "layl.downloads.v1") ?? []
+    }
+
+    func tasteKey(_ titleID: String) -> String {
+        "\(activeProfileID ?? "none")|\(titleID)"
+    }
+
+    func taste(for titleID: String) -> String? {
+        tastes[tasteKey(titleID)]
+    }
+
+    func setTaste(_ value: String, for titleID: String) {
+        tastes[tasteKey(titleID)] = value
+        UserDefaults.standard.set(tastes, forKey: "layl.tastes.v1")
+    }
+
+    func isDownloaded(_ titleID: String) -> Bool {
+        downloads.contains(titleID)
+    }
+
+    func toggleDownload(_ titleID: String) {
+        if let index = downloads.firstIndex(of: titleID) {
+            downloads.remove(at: index)
+        } else {
+            downloads.insert(titleID, at: 0)
+        }
+        UserDefaults.standard.set(downloads, forKey: "layl.downloads.v1")
     }
 
     func loadSources() {

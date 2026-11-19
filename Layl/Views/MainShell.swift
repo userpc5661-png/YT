@@ -2,8 +2,7 @@ import SwiftUI
 
 enum AppSection: String, CaseIterable, Identifiable, Hashable {
     case home
-    case fresh
-    case myList
+    case clips
     case search
     case profile
 
@@ -12,18 +11,16 @@ enum AppSection: String, CaseIterable, Identifiable, Hashable {
     func title(_ language: AppLanguage) -> String {
         switch self {
         case .home: return language.t("الرئيسية", "Home")
-        case .fresh: return language.t("جديد", "New")
-        case .myList: return language.t("قائمتي", "My List")
+        case .clips: return language.t("مقاطع", "Clips")
         case .search: return language.t("بحث", "Search")
-        case .profile: return language.t("حسابي", "Account")
+        case .profile: return language.t("ليل", "Layl")
         }
     }
 
     var symbol: String {
         switch self {
         case .home: return "house.fill"
-        case .fresh: return "flame.fill"
-        case .myList: return "plus.rectangle.on.rectangle"
+        case .clips: return "play.rectangle.on.rectangle.fill"
         case .search: return "magnifyingglass"
         case .profile: return "person.crop.circle"
         }
@@ -38,22 +35,36 @@ struct MainShell: View {
     var body: some View {
         Group {
             if sizeClass == .regular {
-                HStack(spacing: 0) {
-                    sidebar
-                    Divider().overlay(Color.white.opacity(0.08))
-                    stack(for: section)
-                        .id(section)
+                if #available(iOS 18, *) {
+                    modernTabs
+                } else {
+                    legacySplit
                 }
-                .background(Color.black)
             } else {
-                VStack(spacing: 0) {
-                    stack(for: section)
-                        .id(section)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    phoneTabBar
-                }
-                .background(Color.black)
+                stack(for: section)
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        floatingBar
+                    }
             }
+        }
+        .background(Color.black)
+        .sheet(item: Binding(get: { model.detailTitle }, set: { model.detailTitle = $0 })) { title in
+            NavigationStack {
+                TitleDetailView(title: title)
+            }
+            .laylGlassSheet()
+        }
+        .sheet(item: Binding(get: { model.detailRemote }, set: { model.detailRemote = $0 })) { title in
+            NavigationStack {
+                RemoteDetailView(title: title)
+            }
+            .laylGlassSheet()
+        }
+        .sheet(item: Binding(get: { model.detailShow }, set: { model.detailShow = $0 })) { show in
+            NavigationStack {
+                StreamingShowDetailView(show: show)
+            }
+            .laylGlassSheet()
         }
         .fullScreenCover(
             item: Binding(get: { model.remotePlay }, set: { model.remotePlay = $0 })
@@ -75,16 +86,42 @@ struct MainShell: View {
         }
     }
 
+    @available(iOS 18, *)
+    private var modernTabs: some View {
+        TabView(selection: $section) {
+            Tab(AppSection.home.title(model.language), systemImage: AppSection.home.symbol, value: AppSection.home) {
+                stack(for: .home)
+            }
+            Tab(AppSection.clips.title(model.language), systemImage: AppSection.clips.symbol, value: AppSection.clips) {
+                stack(for: .clips)
+            }
+            Tab(AppSection.search.title(model.language), systemImage: AppSection.search.symbol, value: AppSection.search) {
+                stack(for: .search)
+            }
+            Tab(AppSection.profile.title(model.language), systemImage: AppSection.profile.symbol, value: AppSection.profile) {
+                stack(for: .profile)
+            }
+        }
+        .modifier(LaylTabChrome())
+    }
+
+    private var legacySplit: some View {
+        HStack(spacing: 0) {
+            sidebar
+            Divider().overlay(Color.white.opacity(0.08))
+            stack(for: section)
+                .id(section)
+        }
+    }
+
     private func stack(for section: AppSection) -> some View {
         NavigationStack {
             Group {
                 switch section {
                 case .home:
                     HomeView()
-                case .fresh:
-                    DiscoverView()
-                case .myList:
-                    MyListView()
+                case .clips:
+                    ClipsView()
                 case .search:
                     SearchView()
                 case .profile:
@@ -95,34 +132,36 @@ struct MainShell: View {
         }
     }
 
-    private var phoneTabBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 4) {
+    private var floatingBar: some View {
+        LaylGlassGroup(spacing: 0) {
+            HStack(spacing: 0) {
                 ForEach(AppSection.allCases) { item in
                     Button {
                         section = item
                     } label: {
-                        VStack(spacing: 4) {
-                            Image(systemName: item.symbol)
-                                .font(.system(size: 16, weight: .semibold))
+                        VStack(spacing: 3) {
+                            if item == .profile, let profile = model.activeProfile {
+                                ProfileAvatar(profile: profile, size: 22, rounded: true)
+                            } else {
+                                Image(systemName: item.symbol)
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
                             Text(item.title(model.language))
                                 .font(.caption2.weight(section == item ? .bold : .medium))
                                 .lineLimit(1)
                         }
-                        .foregroundStyle(section == item ? Color.white : Color.white.opacity(0.45))
-                        .frame(minWidth: 64)
+                        .foregroundStyle(section == item ? Color.white : Color.white.opacity(0.55))
+                        .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .padding(.horizontal, 6)
                     }
                     .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal, 8)
         }
-        .background(Color.black)
-        .overlay(alignment: .top) {
-            Rectangle().fill(Color.white.opacity(0.08)).frame(height: 0.5)
-        }
+        .laylGlass(in: Capsule(), interactive: true)
+        .padding(.horizontal, 28)
+        .padding(.bottom, 6)
     }
 
     private var sidebar: some View {

@@ -26,6 +26,7 @@ SWIFT_DIRS = [
         "RemotePlayerView.swift",
         "SourceViews.swift",
         "LayoutPreview.swift",
+        "ClipsView.swift",
     ]),
 ]
 

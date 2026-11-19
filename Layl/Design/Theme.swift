@@ -26,14 +26,6 @@ extension View {
         background(LaylTheme.bg.ignoresSafeArea())
     }
 
-    func laylNavigationChrome() -> some View {
-        self
-            .toolbarBackground(LaylTheme.bg, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar(.visible, for: .navigationBar)
-    }
-
     func laylDestinations() -> some View {
         navigationDestination(for: CatalogTitle.self) { title in
             TitleDetailView(title: title)

@@ -32,6 +32,7 @@
 		00000000A110000000000046 /* RemotePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000045 /* RemotePlayerView.swift */; };
 		00000000A110000000000048 /* SourceViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000047 /* SourceViews.swift */; };
 		00000000A11000000000004A /* LayoutPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000049 /* LayoutPreview.swift */; };
+		00000000A11000000000004C /* ClipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004B /* ClipsView.swift */; };
 		00000000A110000000000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000012 /* Assets.xcassets */; };
 		00000000A110000000000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000011 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -62,6 +63,7 @@
 		00000000A110000000000045 /* RemotePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePlayerView.swift; sourceTree = "<group>"; };
 		00000000A110000000000047 /* SourceViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViews.swift; sourceTree = "<group>"; };
 		00000000A110000000000049 /* LayoutPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutPreview.swift; sourceTree = "<group>"; };
+		00000000A11000000000004B /* ClipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsView.swift; sourceTree = "<group>"; };
 		00000000A110000000000010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00000000A110000000000011 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		00000000A110000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -102,7 +104,7 @@
 				00000000A110000000000022 /* Model */,
 				00000000A110000000000027 /* Design */,
 				00000000A110000000000030 /* Services */,
-				00000000A11000000000004B /* Views */,
+				00000000A11000000000004D /* Views */,
 				00000000A110000000000012 /* Assets.xcassets */,
 				00000000A110000000000010 /* Info.plist */,
 				00000000A110000000000011 /* PrivacyInfo.xcprivacy */,
@@ -142,7 +144,7 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		00000000A11000000000004B /* Views */ = {
+		00000000A11000000000004D /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				00000000A110000000000031 /* Components.swift */,
@@ -158,6 +160,7 @@
 				00000000A110000000000045 /* RemotePlayerView.swift */,
 				00000000A110000000000047 /* SourceViews.swift */,
 				00000000A110000000000049 /* LayoutPreview.swift */,
+				00000000A11000000000004B /* ClipsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -258,6 +261,7 @@
 				00000000A110000000000046 /* RemotePlayerView.swift in Sources */,
 				00000000A110000000000048 /* SourceViews.swift in Sources */,
 				00000000A11000000000004A /* LayoutPreview.swift in Sources */,
+				00000000A11000000000004C /* ClipsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

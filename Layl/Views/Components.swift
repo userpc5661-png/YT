@@ -181,7 +181,9 @@ struct MediaRail: View {
                 HStack(alignment: .bottom, spacing: layout.posterGap) {
                     let titles = Catalog.titles(ids: lane.titleIDs).filter(model.isVisible)
                     ForEach(Array(titles.enumerated()), id: \.element.id) { index, title in
-                        NavigationLink(value: title) {
+                        Button {
+                            model.detailTitle = title
+                        } label: {
                             PosterCard(
                                 title: title,
                                 width: posterWidth,
