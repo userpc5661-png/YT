@@ -49,17 +49,13 @@ struct MainShell: View {
                 }
                 .background(Color.black)
             } else {
-                TabView(selection: $section) {
-                    ForEach(AppSection.allCases) { item in
-                        stack(for: item)
-                            .tabItem { Label(item.title(model.language), systemImage: item.symbol) }
-                            .tag(item)
-                    }
+                VStack(spacing: 0) {
+                    stack(for: section)
+                        .id(section)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    phoneTabBar
                 }
-                .tint(.white)
-                .toolbarBackground(.black, for: .tabBar)
-                .toolbarBackground(.visible, for: .tabBar)
-                .toolbarColorScheme(.dark, for: .tabBar)
+                .background(Color.black)
             }
         }
         .environment(
@@ -100,6 +96,36 @@ struct MainShell: View {
                 }
             }
             .laylDestinations()
+        }
+    }
+
+    private var phoneTabBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 4) {
+                ForEach(AppSection.allCases) { item in
+                    Button {
+                        section = item
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: item.symbol)
+                                .font(.system(size: 16, weight: .semibold))
+                            Text(item.title(model.language))
+                                .font(.caption2.weight(section == item ? .bold : .medium))
+                                .lineLimit(1)
+                        }
+                        .foregroundStyle(section == item ? Color.white : Color.white.opacity(0.45))
+                        .frame(minWidth: 64)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 6)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 8)
+        }
+        .background(Color.black)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Color.white.opacity(0.08)).frame(height: 0.5)
         }
     }
 

@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 /// Width buckets tuned for iPhone 13 mini through iPhone 17 Pro Max (logical points).
 enum LaylPhoneClass: String, Codable {
@@ -44,17 +43,29 @@ struct LaylLayoutMetrics: Equatable {
     let continueCardWidth: CGFloat
     let density: ContentDensity
 
+    static let fallback = LaylLayoutMetrics(
+        phoneClass: .standard,
+        screenWidth: 393,
+        safeTop: 59,
+        safeBottom: 34,
+        contentInset: 16,
+        heroHeight: 460,
+        posterWidth: 114,
+        gridMinWidth: 108,
+        heroTitleSize: 36,
+        detailTitleSize: 34,
+        continueCardWidth: 214,
+        density: .comfortable
+    )
+
     static func current(
+        width: CGFloat,
+        safeTop: CGFloat,
+        safeBottom: CGFloat,
         horizontalSizeClass: UserInterfaceSizeClass?,
         density: ContentDensity = .comfortable
     ) -> LaylLayoutMetrics {
-        let bounds = UIScreen.main.bounds
-        let width = min(bounds.width, bounds.height)
-        let window = UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first { $0.isKeyWindow }
-        let safe = window?.safeAreaInsets ?? .zero
+        let width = max(width, 320)
 
         let phoneClass: LaylPhoneClass
         if horizontalSizeClass == .regular {
@@ -122,8 +133,8 @@ struct LaylLayoutMetrics: Equatable {
         return LaylLayoutMetrics(
             phoneClass: phoneClass,
             screenWidth: width,
-            safeTop: safe.top,
-            safeBottom: safe.bottom,
+            safeTop: safeTop,
+            safeBottom: safeBottom,
             contentInset: baseInset,
             heroHeight: hero,
             posterWidth: poster * densityFactor,
@@ -137,7 +148,7 @@ struct LaylLayoutMetrics: Equatable {
 }
 
 private struct LaylLayoutKey: EnvironmentKey {
-    static let defaultValue = LaylLayoutMetrics.current(horizontalSizeClass: .compact)
+    static let defaultValue = LaylLayoutMetrics.fallback
 }
 
 extension EnvironmentValues {

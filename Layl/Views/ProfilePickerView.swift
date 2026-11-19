@@ -83,14 +83,14 @@ struct ProfilePickerView: View {
     }
 
     private func profileButton(_ profile: Profile) -> some View {
-        VStack(spacing: 10) {
-            Button {
-                if managing {
-                    pendingDelete = profile
-                } else {
-                    model.select(profile)
-                }
-            } label: {
+        Button {
+            if managing {
+                pendingDelete = profile
+            } else {
+                model.select(profile)
+            }
+        } label: {
+            VStack(spacing: 10) {
                 ProfileAvatar(profile: profile, selected: false)
                     .overlay(alignment: .topLeading) {
                         if managing && model.profiles.count > 1 {
@@ -102,20 +102,23 @@ struct ProfilePickerView: View {
                                 .padding(4)
                         }
                     }
+                Text(profile.name)
+                    .font(.callout.weight(.medium))
+                    .lineLimit(1)
+                    .foregroundStyle(.white)
+                if profile.isKids {
+                    Text(model.language.t("أطفال", "Kids"))
+                        .font(.caption2.weight(.bold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color(hex: profile.colorHex).opacity(0.25), in: Capsule())
+                        .foregroundStyle(.white)
+                }
             }
-            .buttonStyle(.plain)
-
-            Text(profile.name)
-                .font(.callout.weight(.medium))
-                .lineLimit(1)
-            if profile.isKids {
-                Text(model.language.t("أطفال", "Kids"))
-                    .font(.caption2.weight(.bold))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Color(hex: profile.colorHex).opacity(0.25), in: Capsule())
-            }
+            .frame(minWidth: 120, minHeight: 160)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 
     private var addButton: some View {
