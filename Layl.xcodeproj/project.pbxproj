@@ -87,6 +87,7 @@
 				00000000A110000000000015 /* LaylApp.swift */,
 				00000000A110000000000020 /* Model */,
 				00000000A110000000000025 /* Design */,
+				00000000A110000000000028 /* Services */,
 				00000000A11000000000003D /* Views */,
 				00000000A110000000000012 /* Assets.xcassets */,
 				00000000A110000000000010 /* Info.plist */,
@@ -113,6 +114,14 @@
 				00000000A110000000000023 /* LayoutMetrics.swift */,
 			);
 			path = Design;
+			sourceTree = "<group>";
+		};
+		00000000A110000000000028 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				00000000A110000000000026 /* StreamingAvailabilityAPI.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		00000000A11000000000003D /* Views */ = {

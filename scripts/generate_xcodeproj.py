@@ -86,6 +86,7 @@ for folder, names in SWIFT_DIRS:
 
 model_group, model_children = groups["Model"]
 design_group, design_children = groups["Design"]
+services_group, services_children = groups["Services"]
 views_group, views_children = groups["Views"]
 root_children = groups[""][1]
 
@@ -252,6 +253,7 @@ pbx = f"""// !$*UTF8*$!
 				{root_children[0][1]} /* LaylApp.swift */,
 				{model_group} /* Model */,
 				{design_group} /* Design */,
+				{services_group} /* Services */,
 				{views_group} /* Views */,
 				{assets_ref} /* Assets.xcassets */,
 				{info_ref} /* Info.plist */,
@@ -274,6 +276,14 @@ pbx = f"""// !$*UTF8*$!
 {child_block(design_children)}
 			);
 			path = Design;
+			sourceTree = "<group>";
+		}};
+		{services_group} /* Services */ = {{
+			isa = PBXGroup;
+			children = (
+{child_block(services_children)}
+			);
+			path = Services;
 			sourceTree = "<group>";
 		}};
 		{views_group} /* Views */ = {{
