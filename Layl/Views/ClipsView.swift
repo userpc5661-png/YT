@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ClipsView: View {
     @Environment(AppModel.self) private var model
-    @Environment(\.laylLayout) private var layout
 
     private var clips: [CatalogTitle] {
         Catalog.all.filter { title in
@@ -15,7 +14,7 @@ struct ClipsView: View {
             ScrollView(.vertical) {
                 LazyVStack(spacing: 0) {
                     ForEach(clips) { title in
-                        clipPage(title, height: geo.size.height)
+                        clipPage(title, size: geo.size)
                     }
                 }
                 .scrollTargetLayout()
@@ -33,10 +32,10 @@ struct ClipsView: View {
         }
     }
 
-    private func clipPage(_ title: CatalogTitle, height: CGFloat) -> some View {
+    private func clipPage(_ title: CatalogTitle, size: CGSize) -> some View {
         ZStack(alignment: .bottomLeading) {
             CatalogImage(asset: title.backdropAsset)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(width: size.width, height: size.height)
                 .clipped()
             LinearGradient(colors: [.clear, .black.opacity(0.85)], startPoint: .center, endPoint: .bottom)
             VStack(alignment: .leading, spacing: 10) {
@@ -71,9 +70,10 @@ struct ClipsView: View {
                 }
             }
             .padding(20)
-            .padding(.bottom, 24)
+            .padding(.bottom, 72)
+            .frame(width: size.width, alignment: .leading)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: max(height, 480))
+        .frame(width: size.width, height: max(size.height, 1))
+        .clipped()
     }
 }

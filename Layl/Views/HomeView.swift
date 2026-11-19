@@ -16,40 +16,46 @@ struct HomeView: View {
 
     var body: some View {
         let featured = filteredFeatured
-        ScrollView {
-            VStack(alignment: .leading, spacing: layout.rowSpacing) {
-                Color.clear.frame(height: 118)
-                if !featured.isEmpty {
-                    hero(featured)
-                }
-                if !model.continueWatching().isEmpty {
-                    continueRail
-                }
-                if !model.myList().isEmpty {
-                    myListRail
-                }
-                if chip == .series {
-                    seriesRail
-                } else if chip == .movies {
-                    moviesRail
-                } else if chip == .fresh {
-                    newestRail
-                } else if let homeGenre {
-                    genreRail(homeGenre)
-                } else {
-                    onlyOnRail
-                    newestRail
-                    ForEach(Catalog.homeLanes(kidsOnly: model.kidsOnly)) { lane in
-                        MediaRail(lane: lane, posterWidth: layout.posterWidth)
+        VStack(spacing: 8) {
+            chipRow
+            ScrollView {
+                VStack(alignment: .leading, spacing: layout.rowSpacing) {
+                    if !featured.isEmpty {
+                        hero(featured)
                     }
+                    if !model.continueWatching().isEmpty {
+                        continueRail
+                    }
+                    if !model.myList().isEmpty {
+                        myListRail
+                    }
+                    if chip == .series {
+                        seriesRail
+                    } else if chip == .movies {
+                        moviesRail
+                    } else if chip == .fresh {
+                        newestRail
+                    } else if let homeGenre {
+                        genreRail(homeGenre)
+                    } else {
+                        onlyOnRail
+                        newestRail
+                        ForEach(Catalog.homeLanes(kidsOnly: model.kidsOnly)) { lane in
+                            MediaRail(lane: lane, posterWidth: layout.posterWidth)
+                        }
+                    }
+                    sourceRails
                 }
-                sourceRails
+                .laylHugsWidth()
+                .padding(.bottom, 28)
             }
-            .padding(.bottom, 28)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .clipped()
         .background { ambient }
-        .overlay(alignment: .top) { topBar }
-        .toolbar(.hidden, for: .navigationBar)
+        .toolbar { homeToolbar }
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .laylNavigationChrome()
         .onAppear { model.reloadSourceRails() }
         .sheet(isPresented: $showGenres) { genreSheet }
         .sheet(isPresented: $showCast) { castSheet }
@@ -99,70 +105,71 @@ struct HomeView: View {
         let asset = ambientAsset
         let tone = ArtworkTone.color(asset: asset)
         return ZStack {
-            tone.ignoresSafeArea()
+            tone
             CatalogImage(asset: asset)
-                .blur(radius: 50)
-                .scaleEffect(1.35)
-                .opacity(0.55)
-                .ignoresSafeArea()
-            LinearGradient(colors: [tone.opacity(0.2), .black.opacity(0.82)], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .blur(radius: 28)
+                .opacity(0.45)
+            LinearGradient(colors: [tone.opacity(0.15), .black.opacity(0.9)], startPoint: .top, endPoint: .bottom)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
+        .ignoresSafeArea()
         .animation(.easeInOut(duration: 0.45), value: asset)
     }
 
-    private var topBar: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
+    @ToolbarContentBuilder
+    private var homeToolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            HStack(spacing: 8) {
                 Image("BrandMark")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 28, height: 28)
+                    .frame(width: 26, height: 26)
                     .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-                    .accessibilityLabel("Layl")
                 Text(model.language.t("الرئيسية", "Home"))
-                    .font(.title3.weight(.bold))
-                Spacer(minLength: 8)
-                headerIcon("airplayvideo", model.language.t("البث", "Cast")) { showCast = true }
-                headerIcon("arrow.down.to.line", model.language.t("التنزيلات", "Downloads")) { showDownloads = true }
-                headerIcon("bell", model.language.t("جديد", "New")) { showBell = true }
+                    .font(.headline.weight(.bold))
+                    .lineLimit(1)
             }
-            ScrollView(.horizontal, showsIndicators: false) {
-                LaylGlassGroup(spacing: 8) {
-                    HStack(spacing: 8) {
-                        chipButton(.series, model.language.t("مسلسلات", "Series"))
-                        chipButton(.movies, model.language.t("أفلام", "Films"))
-                        chipButton(.fresh, model.language.t("جديد ورائج", "New & hot"))
-                        Button {
-                            showGenres = true
-                        } label: {
-                            HStack(spacing: 4) {
-                                Text(homeGenre?.title(model.language) ?? model.language.t("التصنيفات", "Categories"))
-                                Image(systemName: "chevron.down").font(.caption2.weight(.bold))
-                            }
-                            .font(.subheadline.weight(.semibold))
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .laylGlassCapsule()
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Layl")
         }
-        .padding(.horizontal, sideInset)
-        .padding(.top, 4)
-        .padding(.bottom, 6)
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            Button { showCast = true } label: { Image(systemName: "airplayvideo") }
+                .accessibilityLabel(model.language.t("البث", "Cast"))
+            Button { showDownloads = true } label: { Image(systemName: "arrow.down.to.line") }
+                .accessibilityLabel(model.language.t("التنزيلات", "Downloads"))
+            Button { showBell = true } label: { Image(systemName: "bell") }
+                .accessibilityLabel(model.language.t("جديد", "New"))
+        }
     }
 
-    private func headerIcon(_ symbol: String, _ label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.body.weight(.semibold))
-                .frame(width: 34, height: 34)
+    private var chipRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LaylGlassGroup(spacing: 8) {
+                HStack(spacing: 8) {
+                    chipButton(.series, model.language.t("مسلسلات", "Series"))
+                    chipButton(.movies, model.language.t("أفلام", "Films"))
+                    chipButton(.fresh, model.language.t("جديد ورائج", "New & hot"))
+                    Button {
+                        showGenres = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(homeGenre?.title(model.language) ?? model.language.t("التصنيفات", "Categories"))
+                                .lineLimit(1)
+                            Image(systemName: "chevron.down").font(.caption2.weight(.bold))
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .modifier(LaylChipGlass(active: true))
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, sideInset)
+            }
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(label)
+        .laylHugsWidth()
     }
 
     private func chipButton(_ value: HomeChip, _ title: String) -> some View {
@@ -175,15 +182,16 @@ struct HomeView: View {
         } label: {
             Text(title)
                 .font(.subheadline.weight(.semibold))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .lineLimit(1)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
                 .foregroundStyle(selected ? Color.black : Color.white)
                 .background {
                     if selected {
                         Capsule().fill(Color.white)
                     }
                 }
-                .laylGlassCapsule(interactive: !selected)
+                .modifier(LaylChipGlass(active: !selected))
         }
         .buttonStyle(.plain)
     }
@@ -263,29 +271,37 @@ struct HomeView: View {
                 )
             }
         }
+        .laylHugsWidth()
     }
 
     private func hero(_ featured: [CatalogTitle]) -> some View {
         let index = min(featuredIndex, max(featured.count - 1, 0))
         let title = featured[index]
+        let imageHeight = min(heroHeight * 0.72, 340)
         return VStack(spacing: 10) {
             ZStack(alignment: .bottom) {
                 CatalogImage(asset: title.backdropAsset)
                     .frame(maxWidth: .infinity)
-                    .frame(height: heroHeight * 0.78)
+                    .frame(height: imageHeight)
+                    .overlay(alignment: .bottom) {
+                        LinearGradient(colors: [.clear, .black.opacity(0.88)], startPoint: .center, endPoint: .bottom)
+                            .frame(height: imageHeight * 0.72)
+                            .allowsHitTesting(false)
+                    }
                     .clipped()
-                LinearGradient(colors: [.clear, .black.opacity(0.82)], startPoint: .center, endPoint: .bottom)
-                VStack(spacing: 8) {
+                VStack(spacing: 10) {
                     Text(title.title.text(model.language))
-                        .font(.system(size: min(layout.heroTitleSize, 40), weight: .black))
+                        .font(.system(size: min(layout.heroTitleSize, 34), weight: .black))
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .minimumScaleFactor(0.6)
-                        .shadow(color: .black.opacity(0.7), radius: 6, y: 2)
+                        .frame(maxWidth: .infinity)
                     Text(title.genres.prefix(3).map { $0.title(model.language) }.joined(separator: " · "))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.9))
                         .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .frame(maxWidth: .infinity)
                     HStack(spacing: 8) {
                         Button {
                             model.play(title: title)
@@ -293,33 +309,29 @@ struct HomeView: View {
                             Label(playLabel(title), systemImage: "play.fill")
                                 .font(.headline.weight(.bold))
                                 .foregroundStyle(.black)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 11)
+                                .padding(.vertical, 12)
                                 .background(.white, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                         }
                         .buttonStyle(.plain)
-                        Button {
-                            model.toggleSaved(title.id)
-                        } label: {
-                            Label(model.language.t("قائمتي", "My List"), systemImage: model.isSaved(title.id) ? "checkmark" : "plus")
-                                .font(.headline.weight(.bold))
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 11)
-                                .background(.white.opacity(0.22), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                        }
-                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity)
+                        myListButton(title)
                     }
                     Button {
                         model.detailTitle = title
                     } label: {
                         Text(model.language.t("التفاصيل", "Details"))
                             .font(.caption.weight(.semibold))
+                            .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(14)
+                .padding(16)
+                .frame(maxWidth: .infinity)
             }
+            .frame(maxWidth: .infinity)
             .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
             .padding(.horizontal, sideInset)
             HStack(spacing: 6) {
@@ -332,6 +344,32 @@ struct HomeView: View {
                         }
                 }
             }
+            .frame(maxWidth: .infinity)
+        }
+        .laylHugsWidth()
+    }
+
+    @ViewBuilder
+    private func myListButton(_ title: CatalogTitle) -> some View {
+        let label = Label(
+            model.language.t("قائمتي", "My List"),
+            systemImage: model.isSaved(title.id) ? "checkmark" : "plus"
+        )
+        .font(.headline.weight(.bold))
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        if #available(iOS 26, *) {
+            Button { model.toggleSaved(title.id) } label: { label }
+                .buttonStyle(.glass)
+                .frame(maxWidth: .infinity)
+        } else {
+            Button { model.toggleSaved(title.id) } label: {
+                label.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity)
         }
     }
 
@@ -412,7 +450,10 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(model.language.t("متابعة المشاهدة", "Continue watching"))
                 .font(.title3.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .padding(.horizontal, sideInset)
+                .laylHugsWidth()
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(model.continueWatching()) { item in
@@ -433,7 +474,9 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, sideInset)
             }
+            .laylHugsWidth()
         }
+        .laylHugsWidth()
     }
 
     private var myListRail: some View {

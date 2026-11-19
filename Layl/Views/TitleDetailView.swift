@@ -50,9 +50,8 @@ struct TitleDetailView: View {
                         .font(.headline.weight(.semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 8))
                     }
-                    .buttonStyle(.plain)
+                    .laylGlassButton()
                     VStack(alignment: .leading, spacing: 6) {
                         Text(title.synopsis.text(language))
                             .font(.subheadline)
@@ -72,7 +71,14 @@ struct TitleDetailView: View {
                 .padding(.bottom, 28)
             }
         }
-        .background(Color.black.opacity(0.92))
+        .frame(maxWidth: .infinity)
+        .background {
+            if #available(iOS 26, *) {
+                Color.clear
+            } else {
+                Color.black.opacity(0.96)
+            }
+        }
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden(true)
         .onAppear { model.loadStreamingInfo(for: title) }
@@ -178,6 +184,7 @@ struct TitleDetailView: View {
                 }
             }
         }
+        .laylHugsWidth()
     }
 
     private func paneTitle(_ pane: DetailPane, _ language: AppLanguage) -> String {
@@ -211,7 +218,10 @@ struct TitleDetailView: View {
             ForEach(title.episodes) { episode in
                 Button { model.play(title: title, episode: episode) } label: {
                     ZStack {
-                        CatalogImage(asset: episode.stillAsset).frame(height: 160).clipped()
+                        CatalogImage(asset: episode.stillAsset)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 160)
+                            .clipped()
                         Image(systemName: "play.fill").font(.title).padding(16).background(.black.opacity(0.45), in: Circle())
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -242,8 +252,8 @@ struct TitleDetailView: View {
     private var header: some View {
         ZStack(alignment: .top) {
             CatalogImage(asset: title.backdropAsset)
-                .frame(height: min(layout.heroHeight * 0.55, 280))
                 .frame(maxWidth: .infinity)
+                .frame(height: min(layout.heroHeight * 0.55, 240))
                 .clipped()
             HStack {
                 Button { model.play(title: title) } label: {

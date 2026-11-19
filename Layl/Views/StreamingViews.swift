@@ -7,8 +7,10 @@ struct RemotePosterImage: View {
     private var height: CGFloat { width * 1.48 }
 
     var body: some View {
-        remoteImage
+        Color.clear
+            .overlay { remoteImage }
             .frame(width: width, height: height)
+            .clipped()
             .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 
@@ -44,23 +46,24 @@ struct RemoteBackdropImage: View {
     var height: CGFloat = 320
 
     var body: some View {
-        Group {
-            if let urlString, let url = URL(string: urlString) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image.resizable().scaledToFill()
-                    default:
-                        placeholder
+        Color.clear
+            .overlay {
+                if let urlString, let url = URL(string: urlString) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image.resizable().scaledToFill()
+                        default:
+                            placeholder
+                        }
                     }
+                } else {
+                    placeholder
                 }
-            } else {
-                placeholder
             }
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: height)
-        .clipped()
+            .frame(maxWidth: .infinity)
+            .frame(height: height)
+            .clipped()
     }
 
     private var placeholder: some View {
@@ -106,7 +109,10 @@ struct StreamingRail: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(lane.title.text(model.language))
                 .font(.title3.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .padding(.horizontal, layout.contentInset)
+                .laylHugsWidth()
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(lane.shows) { show in
@@ -118,7 +124,9 @@ struct StreamingRail: View {
                 }
                 .padding(.horizontal, layout.contentInset)
             }
+            .laylHugsWidth()
         }
+        .laylHugsWidth()
     }
 }
 

@@ -29,6 +29,7 @@ struct RootView: View {
                 }
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
+            .clipped()
             .environment(\.layoutDirection, model.language == .arabic ? .rightToLeft : .leftToRight)
             .environment(\.locale, Locale(identifier: model.language == .arabic ? "ar_SA" : "en_US"))
             .environment(

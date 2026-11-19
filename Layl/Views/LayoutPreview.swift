@@ -26,15 +26,21 @@ struct LayoutSpecGallery: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("\(sample.0) · \(metrics.phoneClass.rawValue)")
                             .font(.headline)
-                        Text(String(format: "inset %.0f  hero %.0f  poster %.0f×%.0f  gap %.0f  title %.0f",
+                        let card = sample.1 - metrics.contentInset * 2
+                        Text(String(format: "inset %.0f  card %.0f / %.0f  hero %.0f  poster %.0f×%.0f",
                                     metrics.contentInset,
+                                    card,
+                                    sample.1,
                                     metrics.heroHeight,
                                     metrics.posterWidth,
-                                    metrics.posterHeight,
-                                    metrics.posterGap,
-                                    metrics.heroTitleSize))
+                                    metrics.posterHeight))
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(.secondary)
+                        Text(card > 0 && card < sample.1 && metrics.posterWidth + metrics.contentInset * 2 <= sample.1
+                             ? "fits the safe width"
+                             : "overflows the safe width")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(card > 0 && card < sample.1 ? Color.green : Color.red)
                         HStack(spacing: metrics.posterGap) {
                             ForEach(0..<3, id: \.self) { _ in
                                 RoundedRectangle(cornerRadius: 4)

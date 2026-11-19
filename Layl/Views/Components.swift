@@ -5,17 +5,24 @@ struct CatalogImage: View {
     let asset: String
 
     var body: some View {
-        if let image = UIImage(named: asset) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFill()
-        } else {
-            LinearGradient(
-                colors: [Color(red: 0.28, green: 0.05, blue: 0.07), Color(red: 0.08, green: 0.08, blue: 0.08)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        }
+        // Color.clear takes the frame it is given. The photo is drawn in an overlay
+        // so scaledToFill cannot push the parent wider than the screen.
+        Color.clear
+            .overlay {
+                if let image = UIImage(named: asset) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    LinearGradient(
+                        colors: [Color(red: 0.28, green: 0.05, blue: 0.07), Color(red: 0.08, green: 0.08, blue: 0.08)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                }
+            }
+            .clipped()
+            .accessibilityHidden(true)
     }
 }
 
@@ -86,6 +93,7 @@ struct PosterCard: View {
                 }
         }
         .frame(width: rank == nil ? width : width * 1.48, alignment: .leading)
+        .clipped()
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(title.title.text(language))
     }
@@ -167,7 +175,9 @@ struct MediaRail: View {
             HStack {
                 Text(lane.title.text(model.language))
                     .font(.title3.weight(.bold))
-                Spacer()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                Spacer(minLength: 8)
                 NavigationLink(value: lane) {
                     Text(model.language.t("عرض الكل", "See all"))
                         .font(.caption.weight(.semibold))
@@ -176,6 +186,7 @@ struct MediaRail: View {
                 .buttonStyle(.plain)
             }
             .padding(.horizontal, horizontalPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .bottom, spacing: layout.posterGap) {
@@ -197,7 +208,9 @@ struct MediaRail: View {
                 .padding(.horizontal, horizontalPadding)
                 .padding(.vertical, 4)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @Environment(\.laylLayout) private var layout

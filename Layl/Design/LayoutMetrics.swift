@@ -83,16 +83,16 @@ struct LaylLayoutMetrics: Equatable {
         let posterHeight = posterWidth * 1.5
 
         let heroRatio: CGFloat = switch phoneClass {
-        case .se: 1.15
-        case .compact: 1.18
-        case .standard: 1.16
-        case .pro: 1.14
-        case .proMax: 1.10
-        case .pad: 0.52
+        case .se: 0.92
+        case .compact: 0.90
+        case .standard: 0.86
+        case .pro: 0.84
+        case .proMax: 0.80
+        case .pad: 0.42
         }
-        let heroHeight = (shortSide * heroRatio).clamped(to: 340...680)
+        let heroHeight = (shortSide * heroRatio).clamped(to: 260...460)
 
-        let inset = (shortSide * 0.042).clamped(to: 12...36)
+        let inset: CGFloat = phoneClass == .pad ? 28 : 16
         let rowSpacing = (shortSide * 0.04).clamped(to: 14...32)
         let posterGap: CGFloat = phoneClass == .pad ? 10 : 8
         let titleSize = (shortSide * 0.092).clamped(to: 28...64) * min(typeScale, 1.2)

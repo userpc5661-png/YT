@@ -15,13 +15,30 @@ jobs:
       - name: Check out
         uses: actions/checkout@v4
 
-      - name: Use newest Xcode
+      - name: Require Xcode 26
         run: |
           set -euo pipefail
-          selected="$(ls -d /Applications/Xcode*.app | sort -V | tail -n 1)"
+          selected="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -n 1 || true)"
+          if [[ -z "${selected}" || ! -d "${selected}" ]]; then
+            echo "Xcode 26 is not installed on this runner." >&2
+            ls -d /Applications/Xcode*.app >&2 || true
+            exit 1
+          fi
           sudo xcode-select -s "$selected"
+          echo "Selected ${selected}"
           xcodebuild -version
-          xcodebuild -showsdks | grep -i iphoneos || true
+          sdk="$(xcodebuild -showsdks | awk '/iphoneos[0-9]/ { print $NF }' | tail -n 1)"
+          echo "iPhoneOS SDK: ${sdk}"
+          if [[ ! "${sdk}" =~ iphoneos26 ]]; then
+            echo "Refusing to build. The iOS 26 SDK is required, found: ${sdk:-none}" >&2
+            xcodebuild -showsdks >&2 || true
+            exit 1
+          fi
+          {
+            echo "### Toolchain"
+            echo "- $(xcodebuild -version | tr '\n' ' ')"
+            echo "- SDK \`${sdk}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build unsigned IPA
         run: bash scripts/build-unsigned-ipa.sh

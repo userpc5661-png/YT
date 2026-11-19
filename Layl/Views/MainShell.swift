@@ -34,17 +34,10 @@ struct MainShell: View {
 
     var body: some View {
         Group {
-            if sizeClass == .regular {
-                if #available(iOS 18, *) {
-                    modernTabs
-                } else {
-                    legacySplit
-                }
+            if #available(iOS 18, *) {
+                modernTabs
             } else {
-                stack(for: section)
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
-                        floatingBar
-                    }
+                legacyTabs
             }
         }
         .background(Color.black)
@@ -102,15 +95,23 @@ struct MainShell: View {
                 stack(for: .profile)
             }
         }
-        .modifier(LaylTabChrome())
+        .modifier(LaylTabChrome(regular: sizeClass == .regular))
     }
 
-    private var legacySplit: some View {
-        HStack(spacing: 0) {
-            sidebar
-            Divider().overlay(Color.white.opacity(0.08))
-            stack(for: section)
-                .id(section)
+    private var legacyTabs: some View {
+        TabView(selection: $section) {
+            stack(for: .home)
+                .tabItem { Label(AppSection.home.title(model.language), systemImage: AppSection.home.symbol) }
+                .tag(AppSection.home)
+            stack(for: .clips)
+                .tabItem { Label(AppSection.clips.title(model.language), systemImage: AppSection.clips.symbol) }
+                .tag(AppSection.clips)
+            stack(for: .search)
+                .tabItem { Label(AppSection.search.title(model.language), systemImage: AppSection.search.symbol) }
+                .tag(AppSection.search)
+            stack(for: .profile)
+                .tabItem { Label(AppSection.profile.title(model.language), systemImage: AppSection.profile.symbol) }
+                .tag(AppSection.profile)
         }
     }
 
@@ -130,86 +131,5 @@ struct MainShell: View {
             }
             .laylDestinations()
         }
-    }
-
-    private var floatingBar: some View {
-        LaylGlassGroup(spacing: 0) {
-            HStack(spacing: 0) {
-                ForEach(AppSection.allCases) { item in
-                    Button {
-                        section = item
-                    } label: {
-                        VStack(spacing: 3) {
-                            if item == .profile, let profile = model.activeProfile {
-                                ProfileAvatar(profile: profile, size: 22, rounded: true)
-                            } else {
-                                Image(systemName: item.symbol)
-                                    .font(.system(size: 16, weight: .semibold))
-                            }
-                            Text(item.title(model.language))
-                                .font(.caption2.weight(section == item ? .bold : .medium))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.7)
-                        }
-                        .foregroundStyle(section == item ? Color.white : Color.white.opacity(0.55))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal, 8)
-        }
-        .laylGlass(in: Capsule(), interactive: true)
-        .padding(.horizontal, 28)
-        .padding(.bottom, 6)
-    }
-
-    private var sidebar: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            BrandLockup(mark: 34)
-                .padding(.bottom, 18)
-            ForEach(AppSection.allCases) { item in
-                Button {
-                    section = item
-                } label: {
-                    Label(item.title(model.language), systemImage: item.symbol)
-                        .font(.body.weight(section == item ? .bold : .regular))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 12)
-                        .background(section == item ? Color.white.opacity(0.1) : Color.clear, in: RoundedRectangle(cornerRadius: 10))
-                }
-                .buttonStyle(.plain)
-            }
-            Spacer()
-            Button(action: model.toggleLanguage) {
-                Text(model.language == .arabic ? "English" : "العربية")
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(LaylTheme.muted)
-            if let profile = model.activeProfile {
-                Button(action: model.leaveProfile) {
-                    HStack(spacing: 10) {
-                        ProfileAvatar(profile: profile, size: 36)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(profile.name)
-                                .font(.subheadline.weight(.semibold))
-                            Text(model.language.t("تبديل", "Switch"))
-                                .font(.caption2)
-                                .foregroundStyle(LaylTheme.muted)
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 8)
-            }
-        }
-        .padding(16)
-        .frame(width: 250)
-        .background(Color.black)
     }
 }

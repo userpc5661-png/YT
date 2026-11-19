@@ -84,6 +84,8 @@ extension View {
     @ViewBuilder
     func laylNavigationChrome() -> some View {
         if #available(iOS 26, *) {
+            // The system NavigationStack toolbar is already Liquid Glass. A custom
+            // toolbar background would replace it with a flat material.
             self.toolbarColorScheme(.dark, for: .navigationBar)
         } else {
             self
@@ -96,13 +98,30 @@ extension View {
     @ViewBuilder
     func laylGlassSheet() -> some View {
         if #available(iOS 26, *) {
-            self
-                .presentationDragIndicator(.visible)
-                .presentationBackground(.clear)
+            self.presentationDragIndicator(.visible)
         } else {
             self
                 .presentationDragIndicator(.visible)
                 .presentationBackground(.ultraThinMaterial)
+        }
+    }
+
+    /// Keeps a horizontal rail or page from adopting a child's ideal width.
+    func laylHugsWidth() -> some View {
+        frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+struct LaylChipGlass: ViewModifier {
+    var active: Bool
+
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *), active {
+            content.glassEffect(.regular.interactive(), in: Capsule())
+        } else if active {
+            content.background(.ultraThinMaterial, in: Capsule())
+        } else {
+            content
         }
     }
 }
@@ -123,12 +142,18 @@ struct LaylGlassGroup<Content: View>: View {
 }
 
 struct LaylTabChrome: ViewModifier {
+    var regular: Bool
+
     func body(content: Content) -> some View {
         if #available(iOS 26, *) {
-            content
-                .tabViewStyle(.sidebarAdaptable)
-                .tabBarMinimizeBehavior(.onScrollDown)
-        } else if #available(iOS 18, *) {
+            if regular {
+                content
+                    .tabViewStyle(.sidebarAdaptable)
+                    .tabBarMinimizeBehavior(.onScrollDown)
+            } else {
+                content.tabBarMinimizeBehavior(.onScrollDown)
+            }
+        } else if #available(iOS 18, *), regular {
             content.tabViewStyle(.sidebarAdaptable)
         } else {
             content

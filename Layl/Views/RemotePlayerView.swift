@@ -67,7 +67,10 @@ struct RemoteRail: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.title3.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .padding(.horizontal, layout.contentInset)
+                .laylHugsWidth()
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: layout.posterGap) {
                     ForEach(titles) { item in
@@ -79,7 +82,9 @@ struct RemoteRail: View {
                 }
                 .padding(.horizontal, layout.contentInset)
             }
+            .laylHugsWidth()
         }
+        .laylHugsWidth()
     }
 }
 

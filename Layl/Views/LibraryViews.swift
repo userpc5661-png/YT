@@ -63,6 +63,7 @@ struct BrowseView: View {
             }
             .padding(.horizontal, layout.contentInset)
         }
+        .laylHugsWidth()
     }
 
     private var usedGenres: [Genre] {
@@ -184,6 +185,7 @@ struct SearchView: View {
                     }
                     .padding(.horizontal, layout.contentInset)
                 }
+                .laylHugsWidth()
 
                 if model.hasStreamingAPI, !query.trimmingCharacters(in: .whitespaces).isEmpty {
                     streamingSection
@@ -250,8 +252,10 @@ struct SearchView: View {
                     }
                     .padding(.horizontal, layout.contentInset)
                 }
+                .laylHugsWidth()
             }
         }
+        .laylHugsWidth()
     }
 
     private func genreChip(_ value: Genre?, _ label: String) -> some View {
