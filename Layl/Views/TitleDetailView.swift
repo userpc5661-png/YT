@@ -5,7 +5,8 @@ struct TitleDetailView: View {
 
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.laylLayout) private var layout
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         let language = model.language
@@ -67,38 +68,41 @@ struct TitleDetailView: View {
                                 titleIDs: related.map(\.id),
                                 style: .poster
                             ),
-                            posterWidth: sizeClass == .regular ? 140 : 108
+                            posterWidth: layout.posterWidth
                         )
-                        .padding(.horizontal, -sideInset)
+                        .padding(.horizontal, -layout.contentInset)
+                    }
+
+                    if model.hasStreamingAPI {
+                        streamingAvailability
                     }
 
                     rights
                 }
-                .padding(.horizontal, sideInset)
+                .padding(.horizontal, layout.contentInset)
                 .padding(.bottom, 32)
             }
         }
         .laylScreen()
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden(true)
+        .onAppear { model.loadStreamingInfo(for: title) }
     }
-
-    private var sideInset: CGFloat { sizeClass == .regular ? 28 : 16 }
 
     private var header: some View {
         ZStack(alignment: .bottomLeading) {
             CatalogImage(asset: title.backdropAsset)
-                .frame(height: sizeClass == .regular ? 460 : 340)
+                .frame(height: layout.heroHeight * 0.72)
                 .frame(maxWidth: .infinity)
                 .clipped()
             LinearGradient(colors: [.clear, LaylTheme.bg], startPoint: .center, endPoint: .bottom)
             VStack(alignment: .leading, spacing: 8) {
                 Text(title.title.text(model.language))
-                    .font(.system(size: sizeClass == .regular ? 48 : 34, weight: .heavy))
+                    .font(.system(size: layout.detailTitleSize, weight: .heavy))
                     .lineLimit(3)
                 MetaPills(title: title)
             }
-            .padding(.horizontal, sideInset)
+            .padding(.horizontal, layout.contentInset)
             .padding(.bottom, 12)
         }
         .overlay(alignment: .topLeading) {
@@ -111,8 +115,41 @@ struct TitleDetailView: View {
                     .background(.black.opacity(0.55), in: Circle())
             }
             .buttonStyle(.plain)
-            .padding(.horizontal, sideInset)
+            .padding(.horizontal, layout.contentInset)
             .padding(.top, 12)
+        }
+    }
+
+    private var streamingAvailability: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(model.language.t("أين يُعرض (API)", "Where to stream (API)"))
+                .font(.title3.weight(.bold))
+            if let show = model.titleStreamingInfo[title.id] {
+                if show.streamingOptions.isEmpty {
+                    Text(model.language.t("لا توجد روابط في دولتك المختارة.", "No links in your selected country."))
+                        .font(.footnote)
+                        .foregroundStyle(LaylTheme.muted)
+                } else {
+                    ForEach(show.streamingOptions.prefix(6)) { option in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(option.serviceName).font(.subheadline.weight(.semibold))
+                                Text(option.type).font(.caption).foregroundStyle(LaylTheme.muted)
+                            }
+                            Spacer()
+                            if let link = option.link {
+                                Button(model.language.t("فتح", "Open")) { openURL(link) }
+                                    .font(.caption.weight(.bold))
+                            }
+                        }
+                        .padding(10)
+                        .background(LaylTheme.elevated, in: RoundedRectangle(cornerRadius: 10))
+                    }
+                }
+                APIAttributionFooter()
+            } else {
+                ProgressView()
+            }
         }
     }
 

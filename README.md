@@ -39,7 +39,17 @@ https://origin.cursor.com/git/abdullah-al-harthy/tmp-6d77c1239481e944.git
 - Search by title, synopsis, or credit, and filter by genre.
 - Switch the whole interface between Arabic (RTL) and English (LTR).
 
-The catalog has 26 titles: 13 Blender Foundation open movies, the three-episode series *Caminandes*, and 12 public-domain classics. Posters and backdrops are frames from those same films. Nothing here is a placeholder image, and nothing requires an API key.
+The catalog has 26 titles: 13 Blender Foundation open movies, the three-episode series *Caminandes*, and 12 public-domain classics. Posters and backdrops are frames from those same films.
+
+### Streaming Availability API
+
+Layl can connect to the open [Streaming Availability API](https://github.com/movieofthenight/streaming-availability-api) (Movie of the Night). With a free key from [developers.movieofthenight.com](https://developers.movieofthenight.com/), the **Discover** tab shows Top lists for Netflix, Disney+, Apple TV, Prime, and Max in your country (default Saudi Arabia). **Search** also queries the API, and title pages show where a film streams plus deep links. In-app playback still uses the Internet Archive catalog; API titles open their streaming service unless Layl already has a matching free film.
+
+In the app: **Settings** (gear) → paste **API key** → choose **country** and preferred **services**. Data and posters from the API are subject to [their terms](https://developers.movieofthenight.com/terms-and-conditions).
+
+### iPhone layout
+
+The UI scales for iPhone mini, standard, Pro, and Pro Max width buckets (including 15/16/17 families). **Settings → Screen density** switches comfortable vs compact spacing.
 
 ## Playback and rights
 

@@ -16,6 +16,7 @@ struct LaylApp: App {
 
 struct RootView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     var body: some View {
         Group {
@@ -27,5 +28,9 @@ struct RootView: View {
         }
         .environment(\.layoutDirection, model.language == .arabic ? .rightToLeft : .leftToRight)
         .environment(\.locale, Locale(identifier: model.language == .arabic ? "ar_SA" : "en_US"))
+        .environment(
+            \.laylLayout,
+            LaylLayoutMetrics.current(horizontalSizeClass: sizeClass, density: model.contentDensity)
+        )
     }
 }

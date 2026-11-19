@@ -2,11 +2,20 @@ import SwiftUI
 
 struct ProfilePickerView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.laylLayout) private var layout
     @State private var managing = false
     @State private var showingAdd = false
     @State private var pendingDelete: Profile?
 
-    private let columns = [GridItem(.adaptive(minimum: 120), spacing: 22)]
+    private var columns: [GridItem] {
+        let minimum: CGFloat = switch layout.phoneClass {
+        case .proMax: 132
+        case .pro, .standard: 120
+        case .mini: 108
+        case .pad: 150
+        }
+        return [GridItem(.adaptive(minimum: minimum), spacing: 22)]
+    }
 
     var body: some View {
         NavigationStack {

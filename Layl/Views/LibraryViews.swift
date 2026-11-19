@@ -10,7 +10,7 @@ struct BrowseView: View {
     var mode: BrowseMode
 
     @Environment(AppModel.self) private var model
-    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.laylLayout) private var layout
     @State private var genre: Genre?
 
     var body: some View {
@@ -61,7 +61,7 @@ struct BrowseView: View {
                     chip(item, item.title(model.language))
                 }
             }
-            .padding(.horizontal, sideInset)
+            .padding(.horizontal, layout.contentInset)
         }
     }
 
@@ -94,7 +94,7 @@ struct BrowseView: View {
     }
 
     private func posterGrid(_ titles: [CatalogTitle]) -> some View {
-        let minWidth: CGFloat = sizeClass == .regular ? 150 : 108
+        let minWidth = layout.gridMinWidth
         let columns = [GridItem(.adaptive(minimum: minWidth), spacing: 12)]
         return LazyVGrid(columns: columns, spacing: 16) {
             ForEach(titles) { title in
@@ -104,17 +104,15 @@ struct BrowseView: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, sideInset)
+        .padding(.horizontal, layout.contentInset)
     }
-
-    private var sideInset: CGFloat { sizeClass == .regular ? 28 : 16 }
 }
 
 struct LaneGridView: View {
     let lane: Lane
 
     @Environment(AppModel.self) private var model
-    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.laylLayout) private var layout
 
     var body: some View {
         let titles = Catalog.titles(ids: lane.titleIDs).filter(model.isVisible)
@@ -129,7 +127,7 @@ struct LaneGridView: View {
     }
 
     private func posterGrid(_ titles: [CatalogTitle]) -> some View {
-        let minWidth: CGFloat = sizeClass == .regular ? 150 : 108
+        let minWidth = layout.gridMinWidth
         let columns = [GridItem(.adaptive(minimum: minWidth), spacing: 12)]
         return LazyVGrid(columns: columns, spacing: 16) {
             ForEach(Array(titles.enumerated()), id: \.element.id) { index, title in
@@ -139,13 +137,13 @@ struct LaneGridView: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, sizeClass == .regular ? 28 : 16)
+        .padding(.horizontal, layout.contentInset)
     }
 }
 
 struct SearchView: View {
     @Environment(AppModel.self) private var model
-    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.laylLayout) private var layout
     @State private var query = ""
     @State private var genre: Genre?
 
@@ -171,7 +169,10 @@ struct SearchView: View {
                 }
                 .padding(12)
                 .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
-                .padding(.horizontal, sideInset)
+                .padding(.horizontal, layout.contentInset)
+                .onChange(of: query) { _, value in
+                    model.searchStreaming(query: value)
+                }
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
@@ -180,7 +181,11 @@ struct SearchView: View {
                             genreChip(item, item.title(model.language))
                         }
                     }
-                    .padding(.horizontal, sideInset)
+                    .padding(.horizontal, layout.contentInset)
+                }
+
+                if model.hasStreamingAPI, !query.trimmingCharacters(in: .whitespaces).isEmpty {
+                    streamingSection
                 }
 
                 if titles.isEmpty {
@@ -190,15 +195,18 @@ struct SearchView: View {
                         message: model.language.t("جرّب اسمًا آخر أو تصنيفًا مختلفًا.", "Try another title or genre.")
                     )
                 } else {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: sizeClass == .regular ? 150 : 108), spacing: 12)], spacing: 16) {
+                    Text(model.language.t("تشغيل داخل ليل", "Play inside Layl"))
+                        .font(.headline)
+                        .padding(.horizontal, layout.contentInset)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: layout.gridMinWidth), spacing: 12)], spacing: 16) {
                         ForEach(titles) { title in
                             NavigationLink(value: title) {
-                                PosterCard(title: title, width: sizeClass == .regular ? 150 : 108)
+                                PosterCard(title: title, width: layout.gridMinWidth)
                             }
                             .buttonStyle(.plain)
                         }
                     }
-                    .padding(.horizontal, sideInset)
+                    .padding(.horizontal, layout.contentInset)
                 }
             }
             .padding(.vertical, 12)
@@ -209,7 +217,34 @@ struct SearchView: View {
         .laylNavigationChrome()
     }
 
-    private var sideInset: CGFloat { sizeClass == .regular ? 28 : 16 }
+    private var streamingSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(model.language.t("نتائج البث (API)", "Streaming results (API)"))
+                .font(.headline)
+                .padding(.horizontal, layout.contentInset)
+            if model.streamingSearchLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else if model.streamingSearchResults.isEmpty {
+                Text(model.language.t("لا توجد نتائج بث لهذا الاسم.", "No streaming matches for this name."))
+                    .font(.footnote)
+                    .foregroundStyle(LaylTheme.muted)
+                    .padding(.horizontal, layout.contentInset)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(model.streamingSearchResults) { show in
+                            NavigationLink(value: show) {
+                                StreamingShowCard(show: show, width: layout.posterWidth)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, layout.contentInset)
+                }
+            }
+        }
+    }
 
     private func genreChip(_ value: Genre?, _ label: String) -> some View {
         let selected = genre == value
@@ -229,7 +264,7 @@ struct SearchView: View {
 
 struct MyListView: View {
     @Environment(AppModel.self) private var model
-    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.laylLayout) private var layout
 
     var body: some View {
         let titles = model.myList()
@@ -242,10 +277,10 @@ struct MyListView: View {
                 )
                 .padding(.top, 48)
             } else {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: sizeClass == .regular ? 150 : 108), spacing: 12)], spacing: 16) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: layout.gridMinWidth), spacing: 12)], spacing: 16) {
                     ForEach(titles) { title in
                         NavigationLink(value: title) {
-                            PosterCard(title: title, width: sizeClass == .regular ? 150 : 108)
+                            PosterCard(title: title, width: layout.gridMinWidth)
                         }
                         .buttonStyle(.plain)
                         .contextMenu {
@@ -257,7 +292,7 @@ struct MyListView: View {
                         }
                     }
                 }
-                .padding(sizeClass == .regular ? 28 : 16)
+                .padding(layout.contentInset)
             }
         }
         .laylScreen()

@@ -103,6 +103,7 @@ struct CatalogTitle: Identifiable, Hashable, Codable {
     let archiveID: String
     let quality: TransferQuality
     let episodes: [Episode]
+    let externalImdb: String?
 
     var archivePage: String { "https://archive.org/details/\(archiveID)" }
 

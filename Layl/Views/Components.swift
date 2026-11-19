@@ -196,8 +196,8 @@ struct MediaRail: View {
         }
     }
 
-    @Environment(\.horizontalSizeClass) private var sizeClass
-    private var horizontalPadding: CGFloat { sizeClass == .regular ? 28 : 16 }
+    @Environment(\.laylLayout) private var layout
+    private var horizontalPadding: CGFloat { layout.contentInset }
 
     @ViewBuilder
     private func titleMenu(_ title: CatalogTitle) -> some View {

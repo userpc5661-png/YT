@@ -41,5 +41,8 @@ extension View {
         .navigationDestination(for: Lane.self) { lane in
             LaneGridView(lane: lane)
         }
+        .navigationDestination(for: StreamingShow.self) { show in
+            StreamingShowDetailView(show: show)
+        }
     }
 }

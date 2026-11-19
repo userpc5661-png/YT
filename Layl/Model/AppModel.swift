@@ -8,10 +8,27 @@ final class AppModel {
     var activeProfileID: String?
     var playRequest: PlayRequest?
 
+    // Streaming Availability API — https://github.com/movieofthenight/streaming-availability-api
+    var apiKey: String
+    var apiProvider: StreamingAPIProvider
+    var streamCountry: String
+    var contentDensity: ContentDensity
+    var heroCarouselEnabled: Bool
+    var preferredStreamingServices: Set<String>
+
+    var discoverLanes: [DiscoverLane] = []
+    var discoverLoading = false
+    var discoverError: String?
+    var streamingSearchResults: [StreamingShow] = []
+    var streamingSearchLoading = false
+    var titleStreamingInfo: [String: StreamingShow] = [:]
+
     private var lists: [String: [String]]
     private var progress: [String: [String: WatchProgress]]
     private var lastDiskWrite = Date.distantPast
-    private let storageKey = "layl.state.v1"
+    private let storageKey = "layl.state.v2"
+    private let api = StreamingAvailabilityAPI()
+    private var searchTask: Task<Void, Never>?
 
     init() {
         if let data = UserDefaults.standard.data(forKey: storageKey),
@@ -21,11 +38,185 @@ final class AppModel {
             profiles = saved.profiles
             lists = saved.lists
             progress = saved.progress
+            apiKey = saved.apiKey
+            apiProvider = saved.apiProvider
+            streamCountry = saved.streamCountry
+            contentDensity = saved.contentDensity
+            heroCarouselEnabled = saved.heroCarouselEnabled
+            preferredStreamingServices = Set(saved.preferredStreamingServices)
+        } else if let legacy = UserDefaults.standard.data(forKey: "layl.state.v1"),
+                  let saved = try? JSONDecoder().decode(LegacySavedState.self, from: legacy),
+                  !saved.profiles.isEmpty {
+            language = saved.language
+            profiles = saved.profiles
+            lists = saved.lists
+            progress = saved.progress
+            apiKey = ""
+            apiProvider = .movieOfTheNight
+            streamCountry = "sa"
+            contentDensity = .comfortable
+            heroCarouselEnabled = true
+            preferredStreamingServices = Set(StreamingServiceChip.featured.map(\.id))
         } else {
             language = .arabic
             profiles = Profile.defaults
             lists = [:]
             progress = [:]
+            apiKey = ""
+            apiProvider = .movieOfTheNight
+            streamCountry = "sa"
+            contentDensity = .comfortable
+            heroCarouselEnabled = true
+            preferredStreamingServices = Set(StreamingServiceChip.featured.map(\.id))
+        }
+    }
+
+    var hasStreamingAPI: Bool {
+        !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var outputLanguage: String { language == .arabic ? "ar" : "en" }
+
+    func updatePreferences(
+        apiKey: String,
+        provider: StreamingAPIProvider,
+        country: String,
+        density: ContentDensity,
+        heroCarousel: Bool,
+        services: Set<String>
+    ) {
+        self.apiKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        apiProvider = provider
+        streamCountry = country
+        contentDensity = density
+        heroCarouselEnabled = heroCarousel
+        preferredStreamingServices = services
+        persist()
+        discoverLanes = []
+        discoverError = nil
+    }
+
+    func loadDiscoverCatalog() {
+        guard hasStreamingAPI else {
+            discoverError = language.t("أضف مفتاح API من الإعدادات.", "Add an API key in Settings.")
+            return
+        }
+        guard !discoverLoading else { return }
+        discoverLoading = true
+        discoverError = nil
+        let country = streamCountry
+        let key = apiKey
+        let provider = apiProvider
+        let lang = outputLanguage
+        let services = preferredStreamingServices.isEmpty
+            ? StreamingServiceChip.featured.map(\.id)
+            : Array(preferredStreamingServices)
+        Task { @MainActor in
+            defer { discoverLoading = false }
+            var lanes: [DiscoverLane] = []
+            for service in services.prefix(4) {
+                if let chip = StreamingServiceChip.featured.first(where: { $0.id == service }) {
+                    do {
+                        let shows = try await api.topShows(
+                            country: country,
+                            service: service,
+                            showType: nil,
+                            provider: provider,
+                            apiKey: key,
+                            outputLanguage: lang
+                        )
+                        if !shows.isEmpty {
+                            lanes.append(
+                                DiscoverLane(
+                                    id: "top-\(service)",
+                                    title: L10n(ar: "الأكثر على \(chip.titleAR)", en: "Top on \(chip.titleEN)"),
+                                    shows: shows
+                                )
+                            )
+                        }
+                    } catch {
+                        discoverError = error.localizedDescription
+                    }
+                }
+            }
+            discoverLanes = lanes
+            if lanes.isEmpty, discoverError == nil {
+                discoverError = language.t("لا توجد قوائم لهذه الخدمة/الدولة.", "No lists for this service or country.")
+            }
+        }
+    }
+
+    func searchStreaming(query: String) {
+        searchTask?.cancel()
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 2, hasStreamingAPI else {
+            streamingSearchResults = []
+            streamingSearchLoading = false
+            return
+        }
+        streamingSearchLoading = true
+        let country = streamCountry
+        let key = apiKey
+        let provider = apiProvider
+        let lang = outputLanguage
+        searchTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            guard !Task.isCancelled else { return }
+            do {
+                let shows = try await api.searchByTitle(
+                    title: trimmed,
+                    country: country,
+                    showType: nil,
+                    provider: provider,
+                    apiKey: key,
+                    outputLanguage: lang
+                )
+                streamingSearchResults = shows
+            } catch {
+                streamingSearchResults = []
+            }
+            streamingSearchLoading = false
+        }
+    }
+
+    func loadStreamingInfo(for title: CatalogTitle) {
+        guard hasStreamingAPI else { return }
+        guard titleStreamingInfo[title.id] == nil else { return }
+        let country = streamCountry
+        let key = apiKey
+        let provider = apiProvider
+        let lang = outputLanguage
+        Task { @MainActor in
+            do {
+                let show: StreamingShow
+                if let imdb = title.externalImdb {
+                    show = try await api.show(id: imdb, country: country, provider: provider, apiKey: key, outputLanguage: lang)
+                } else {
+                    let matches = try await api.searchByTitle(
+                        title: title.title.en,
+                        country: country,
+                        showType: title.kind,
+                        provider: provider,
+                        apiKey: key,
+                        outputLanguage: lang
+                    )
+                    guard let first = matches.first else { return }
+                    show = first
+                }
+                titleStreamingInfo[title.id] = show
+            } catch {
+                return
+            }
+        }
+    }
+
+    func catalogMatch(for show: StreamingShow) -> CatalogTitle? {
+        if let byImdb = Catalog.all.first(where: { $0.externalImdb == show.imdbId }) {
+            return byImdb
+        }
+        let folded = show.title.folded
+        return Catalog.all.first {
+            $0.title.en.folded == folded || $0.title.ar.folded == folded
         }
     }
 
@@ -158,13 +349,37 @@ final class AppModel {
 
     private func persist() {
         lastDiskWrite = Date()
-        let saved = SavedState(language: language, profiles: profiles, lists: lists, progress: progress)
+        let saved = SavedState(
+            language: language,
+            profiles: profiles,
+            lists: lists,
+            progress: progress,
+            apiKey: apiKey,
+            apiProvider: apiProvider,
+            streamCountry: streamCountry,
+            contentDensity: contentDensity,
+            heroCarouselEnabled: heroCarouselEnabled,
+            preferredStreamingServices: Array(preferredStreamingServices)
+        )
         if let data = try? JSONEncoder().encode(saved) {
             UserDefaults.standard.set(data, forKey: storageKey)
         }
     }
 
     private struct SavedState: Codable {
+        var language: AppLanguage
+        var profiles: [Profile]
+        var lists: [String: [String]]
+        var progress: [String: [String: WatchProgress]]
+        var apiKey: String
+        var apiProvider: StreamingAPIProvider
+        var streamCountry: String
+        var contentDensity: ContentDensity
+        var heroCarouselEnabled: Bool
+        var preferredStreamingServices: [String]
+    }
+
+    private struct LegacySavedState: Codable {
         var language: AppLanguage
         var profiles: [Profile]
         var lists: [String: [String]]

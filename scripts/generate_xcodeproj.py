@@ -9,8 +9,9 @@ PROJECT = ROOT / "Layl.xcodeproj"
 
 SWIFT_DIRS = [
     ("", ["LaylApp.swift"]),
-    ("Model", ["Models.swift", "Catalog.swift", "AppModel.swift"]),
-    ("Design", ["Theme.swift"]),
+    ("Model", ["Models.swift", "Catalog.swift", "AppModel.swift", "StreamingModels.swift"]),
+    ("Design", ["Theme.swift", "LayoutMetrics.swift"]),
+    ("Services", ["StreamingAvailabilityAPI.swift"]),
     ("Views", [
         "Components.swift",
         "ProfilePickerView.swift",
@@ -19,6 +20,9 @@ SWIFT_DIRS = [
         "PlayerView.swift",
         "LibraryViews.swift",
         "MainShell.swift",
+        "DiscoverView.swift",
+        "SettingsView.swift",
+        "StreamingViews.swift",
     ]),
 ]
 

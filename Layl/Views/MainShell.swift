@@ -1,7 +1,8 @@
 import SwiftUI
 
-enum Section: String, CaseIterable, Identifiable, Hashable {
+enum AppSection: String, CaseIterable, Identifiable, Hashable {
     case home
+    case discover
     case movies
     case series
     case myList
@@ -12,6 +13,7 @@ enum Section: String, CaseIterable, Identifiable, Hashable {
     func title(_ language: AppLanguage) -> String {
         switch self {
         case .home: return language.t("الرئيسية", "Home")
+        case .discover: return language.t("اكتشف", "Discover")
         case .movies: return language.t("أفلام", "Movies")
         case .series: return language.t("مسلسلات", "Series")
         case .myList: return language.t("قائمتي", "My List")
@@ -22,6 +24,7 @@ enum Section: String, CaseIterable, Identifiable, Hashable {
     var symbol: String {
         switch self {
         case .home: return "house.fill"
+        case .discover: return "sparkles.tv"
         case .movies: return "film"
         case .series: return "rectangle.stack"
         case .myList: return "checkmark.rectangle.stack"
@@ -33,7 +36,7 @@ enum Section: String, CaseIterable, Identifiable, Hashable {
 struct MainShell: View {
     @Environment(AppModel.self) private var model
     @Environment(\.horizontalSizeClass) private var sizeClass
-    @State private var section: Section = .home
+    @State private var section: AppSection = .home
 
     var body: some View {
         Group {
@@ -47,7 +50,7 @@ struct MainShell: View {
                 .background(Color.black)
             } else {
                 TabView(selection: $section) {
-                    ForEach(Section.allCases) { item in
+                    ForEach(AppSection.allCases) { item in
                         stack(for: item)
                             .tabItem { Label(item.title(model.language), systemImage: item.symbol) }
                             .tag(item)
@@ -59,6 +62,10 @@ struct MainShell: View {
                 .toolbarColorScheme(.dark, for: .tabBar)
             }
         }
+        .environment(
+            \.laylLayout,
+            LaylLayoutMetrics.current(horizontalSizeClass: sizeClass, density: model.contentDensity)
+        )
         .fullScreenCover(
             item: Binding(
                 get: { model.playRequest },
@@ -74,12 +81,14 @@ struct MainShell: View {
         }
     }
 
-    private func stack(for section: Section) -> some View {
+    private func stack(for section: AppSection) -> some View {
         NavigationStack {
             Group {
                 switch section {
                 case .home:
                     HomeView()
+                case .discover:
+                    DiscoverView()
                 case .movies:
                     BrowseView(mode: .movies)
                 case .series:
@@ -98,7 +107,7 @@ struct MainShell: View {
         VStack(alignment: .leading, spacing: 6) {
             BrandLockup(mark: 34)
                 .padding(.bottom, 18)
-            ForEach(Section.allCases) { item in
+            ForEach(AppSection.allCases) { item in
                 Button {
                     section = item
                 } label: {

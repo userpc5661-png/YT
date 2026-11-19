@@ -312,7 +312,8 @@ private func makeTitles() -> [CatalogTitle] {
             cast: [L10n(ar: "دوان جونز", en: "Duane Jones"), L10n(ar: "جوديث أوديا", en: "Judith O'Dea")],
             rights: "Public Domain", rightsURL: publicDomain,
             archiveID: "Night.Of.The.Living.Dead_1080p", file: "NightOfTheLivingDead_DVD5_512kb.mp4",
-            quality: .archival
+            quality: .archival,
+            externalImdb: "tt0063350"
         ),
         movie(
             id: "nosferatu",
@@ -329,7 +330,8 @@ private func makeTitles() -> [CatalogTitle] {
             cast: [L10n(ar: "ماكس شريك", en: "Max Schreck"), L10n(ar: "غريت شرودر", en: "Greta Schröder")],
             rights: "Public Domain", rightsURL: publicDomain,
             archiveID: "Nosferatu1922", file: "Nosferatu-smaller2.mp4",
-            quality: .archival
+            quality: .archival,
+            externalImdb: "tt0013442"
         ),
         movie(
             id: "sherlock",
@@ -525,7 +527,8 @@ private func movie(
     rightsURL: String,
     archiveID: String,
     file: String,
-    quality: TransferQuality
+    quality: TransferQuality,
+    externalImdb: String? = nil
 ) -> CatalogTitle {
     let title = L10n(ar: ar, en: en)
     let synopsis = L10n(ar: synAr, en: synEn)
@@ -559,7 +562,8 @@ private func movie(
         rightsURL: rightsURL,
         archiveID: archiveID,
         quality: quality,
-        episodes: [episode]
+        episodes: [episode],
+        externalImdb: externalImdb
     )
 }
 
@@ -628,6 +632,7 @@ private func caminandes() -> CatalogTitle {
         rightsURL: ccBy3,
         archiveID: "CaminandesLlamigos",
         quality: .hd,
-        episodes: episodes
+        episodes: episodes,
+        externalImdb: nil
     )
 }

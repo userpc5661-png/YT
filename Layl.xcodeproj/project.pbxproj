@@ -11,14 +11,20 @@
 		00000000A110000000000019 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000018 /* Models.swift */; };
 		00000000A11000000000001B /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000001A /* Catalog.swift */; };
 		00000000A11000000000001D /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000001C /* AppModel.swift */; };
-		00000000A110000000000020 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000001F /* Theme.swift */; };
-		00000000A110000000000023 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000022 /* Components.swift */; };
-		00000000A110000000000025 /* ProfilePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000024 /* ProfilePickerView.swift */; };
-		00000000A110000000000027 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000026 /* HomeView.swift */; };
-		00000000A110000000000029 /* TitleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000028 /* TitleDetailView.swift */; };
-		00000000A11000000000002B /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002A /* PlayerView.swift */; };
-		00000000A11000000000002D /* LibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002C /* LibraryViews.swift */; };
-		00000000A11000000000002F /* MainShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002E /* MainShell.swift */; };
+		00000000A11000000000001F /* StreamingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000001E /* StreamingModels.swift */; };
+		00000000A110000000000022 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000021 /* Theme.swift */; };
+		00000000A110000000000024 /* LayoutMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000023 /* LayoutMetrics.swift */; };
+		00000000A110000000000027 /* StreamingAvailabilityAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000026 /* StreamingAvailabilityAPI.swift */; };
+		00000000A11000000000002A /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000029 /* Components.swift */; };
+		00000000A11000000000002C /* ProfilePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002B /* ProfilePickerView.swift */; };
+		00000000A11000000000002E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002D /* HomeView.swift */; };
+		00000000A110000000000030 /* TitleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002F /* TitleDetailView.swift */; };
+		00000000A110000000000032 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000031 /* PlayerView.swift */; };
+		00000000A110000000000034 /* LibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000033 /* LibraryViews.swift */; };
+		00000000A110000000000036 /* MainShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000035 /* MainShell.swift */; };
+		00000000A110000000000038 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000037 /* DiscoverView.swift */; };
+		00000000A11000000000003A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000039 /* SettingsView.swift */; };
+		00000000A11000000000003C /* StreamingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003B /* StreamingViews.swift */; };
 		00000000A110000000000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000012 /* Assets.xcassets */; };
 		00000000A110000000000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000011 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -28,14 +34,20 @@
 		00000000A110000000000018 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		00000000A11000000000001A /* Catalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
 		00000000A11000000000001C /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		00000000A11000000000001F /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
-		00000000A110000000000022 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
-		00000000A110000000000024 /* ProfilePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePickerView.swift; sourceTree = "<group>"; };
-		00000000A110000000000026 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		00000000A110000000000028 /* TitleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailView.swift; sourceTree = "<group>"; };
-		00000000A11000000000002A /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
-		00000000A11000000000002C /* LibraryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViews.swift; sourceTree = "<group>"; };
-		00000000A11000000000002E /* MainShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShell.swift; sourceTree = "<group>"; };
+		00000000A11000000000001E /* StreamingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingModels.swift; sourceTree = "<group>"; };
+		00000000A110000000000021 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		00000000A110000000000023 /* LayoutMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutMetrics.swift; sourceTree = "<group>"; };
+		00000000A110000000000026 /* StreamingAvailabilityAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingAvailabilityAPI.swift; sourceTree = "<group>"; };
+		00000000A110000000000029 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		00000000A11000000000002B /* ProfilePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePickerView.swift; sourceTree = "<group>"; };
+		00000000A11000000000002D /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		00000000A11000000000002F /* TitleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailView.swift; sourceTree = "<group>"; };
+		00000000A110000000000031 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		00000000A110000000000033 /* LibraryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViews.swift; sourceTree = "<group>"; };
+		00000000A110000000000035 /* MainShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShell.swift; sourceTree = "<group>"; };
+		00000000A110000000000037 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		00000000A110000000000039 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		00000000A11000000000003B /* StreamingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingViews.swift; sourceTree = "<group>"; };
 		00000000A110000000000010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00000000A110000000000011 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		00000000A110000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -73,9 +85,9 @@
 			isa = PBXGroup;
 			children = (
 				00000000A110000000000015 /* LaylApp.swift */,
-				00000000A11000000000001E /* Model */,
-				00000000A110000000000021 /* Design */,
-				00000000A110000000000030 /* Views */,
+				00000000A110000000000020 /* Model */,
+				00000000A110000000000025 /* Design */,
+				00000000A11000000000003D /* Views */,
 				00000000A110000000000012 /* Assets.xcassets */,
 				00000000A110000000000010 /* Info.plist */,
 				00000000A110000000000011 /* PrivacyInfo.xcprivacy */,
@@ -83,34 +95,39 @@
 			path = Layl;
 			sourceTree = "<group>";
 		};
-		00000000A11000000000001E /* Model */ = {
+		00000000A110000000000020 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				00000000A110000000000018 /* Models.swift */,
 				00000000A11000000000001A /* Catalog.swift */,
 				00000000A11000000000001C /* AppModel.swift */,
+				00000000A11000000000001E /* StreamingModels.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
 		};
-		00000000A110000000000021 /* Design */ = {
+		00000000A110000000000025 /* Design */ = {
 			isa = PBXGroup;
 			children = (
-				00000000A11000000000001F /* Theme.swift */,
+				00000000A110000000000021 /* Theme.swift */,
+				00000000A110000000000023 /* LayoutMetrics.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
 		};
-		00000000A110000000000030 /* Views */ = {
+		00000000A11000000000003D /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				00000000A110000000000022 /* Components.swift */,
-				00000000A110000000000024 /* ProfilePickerView.swift */,
-				00000000A110000000000026 /* HomeView.swift */,
-				00000000A110000000000028 /* TitleDetailView.swift */,
-				00000000A11000000000002A /* PlayerView.swift */,
-				00000000A11000000000002C /* LibraryViews.swift */,
-				00000000A11000000000002E /* MainShell.swift */,
+				00000000A110000000000029 /* Components.swift */,
+				00000000A11000000000002B /* ProfilePickerView.swift */,
+				00000000A11000000000002D /* HomeView.swift */,
+				00000000A11000000000002F /* TitleDetailView.swift */,
+				00000000A110000000000031 /* PlayerView.swift */,
+				00000000A110000000000033 /* LibraryViews.swift */,
+				00000000A110000000000035 /* MainShell.swift */,
+				00000000A110000000000037 /* DiscoverView.swift */,
+				00000000A110000000000039 /* SettingsView.swift */,
+				00000000A11000000000003B /* StreamingViews.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -190,14 +207,20 @@
 				00000000A110000000000019 /* Models.swift in Sources */,
 				00000000A11000000000001B /* Catalog.swift in Sources */,
 				00000000A11000000000001D /* AppModel.swift in Sources */,
-				00000000A110000000000020 /* Theme.swift in Sources */,
-				00000000A110000000000023 /* Components.swift in Sources */,
-				00000000A110000000000025 /* ProfilePickerView.swift in Sources */,
-				00000000A110000000000027 /* HomeView.swift in Sources */,
-				00000000A110000000000029 /* TitleDetailView.swift in Sources */,
-				00000000A11000000000002B /* PlayerView.swift in Sources */,
-				00000000A11000000000002D /* LibraryViews.swift in Sources */,
-				00000000A11000000000002F /* MainShell.swift in Sources */,
+				00000000A11000000000001F /* StreamingModels.swift in Sources */,
+				00000000A110000000000022 /* Theme.swift in Sources */,
+				00000000A110000000000024 /* LayoutMetrics.swift in Sources */,
+				00000000A110000000000027 /* StreamingAvailabilityAPI.swift in Sources */,
+				00000000A11000000000002A /* Components.swift in Sources */,
+				00000000A11000000000002C /* ProfilePickerView.swift in Sources */,
+				00000000A11000000000002E /* HomeView.swift in Sources */,
+				00000000A110000000000030 /* TitleDetailView.swift in Sources */,
+				00000000A110000000000032 /* PlayerView.swift in Sources */,
+				00000000A110000000000034 /* LibraryViews.swift in Sources */,
+				00000000A110000000000036 /* MainShell.swift in Sources */,
+				00000000A110000000000038 /* DiscoverView.swift in Sources */,
+				00000000A11000000000003A /* SettingsView.swift in Sources */,
+				00000000A11000000000003C /* StreamingViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

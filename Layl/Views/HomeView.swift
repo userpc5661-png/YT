@@ -3,9 +3,10 @@ import SwiftUI
 
 struct HomeView: View {
     @Environment(AppModel.self) private var model
-    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.laylLayout) private var layout
     @State private var featuredIndex = 0
     @State private var showLicenses = false
+    @State private var showSettings = false
 
     var body: some View {
         let featured = model.featuredTitles
@@ -22,7 +23,7 @@ struct HomeView: View {
                     myListRail
                 }
                 ForEach(Catalog.homeLanes(kidsOnly: model.kidsOnly)) { lane in
-                    MediaRail(lane: lane, posterWidth: posterWidth)
+                    MediaRail(lane: lane, posterWidth: layout.posterWidth)
                 }
             }
             .padding(.bottom, 36)
@@ -30,7 +31,7 @@ struct HomeView: View {
         .laylScreen()
         .toolbar(.hidden, for: .navigationBar)
         .onReceive(Timer.publish(every: 8, on: .main, in: .common).autoconnect()) { _ in
-            guard featured.count > 1 else { return }
+            guard model.heroCarouselEnabled, featured.count > 1 else { return }
             withAnimation(.easeInOut(duration: 0.45)) {
                 featuredIndex = (featuredIndex + 1) % featured.count
             }
@@ -41,10 +42,12 @@ struct HomeView: View {
         .navigationDestination(isPresented: $showLicenses) {
             LicensesView()
         }
+        .navigationDestination(isPresented: $showSettings) {
+            SettingsView()
+        }
     }
 
-    private var posterWidth: CGFloat { sizeClass == .regular ? 150 : 112 }
-    private var sideInset: CGFloat { sizeClass == .regular ? 28 : 16 }
+    private var sideInset: CGFloat { layout.contentInset }
 
     private var topBar: some View {
         HStack(spacing: 14) {
@@ -69,6 +72,11 @@ struct HomeView: View {
                 Menu {
                     Button(model.language.t("تبديل الملف", "Switch profile"), systemImage: "person.2") {
                         model.leaveProfile()
+                    }
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Label(model.language.t("الإعدادات", "Settings"), systemImage: "gearshape")
                     }
                     Button(model.language.t("الحقوق والمصادر", "Rights and sources"), systemImage: "doc.text") {
                         showLicenses = true
@@ -106,7 +114,7 @@ struct HomeView: View {
                     .tracking(1.2)
                     .foregroundStyle(LaylTheme.red)
                 Text(title.title.text(model.language))
-                    .font(.system(size: sizeClass == .regular ? 56 : 36, weight: .heavy))
+                    .font(.system(size: layout.heroTitleSize, weight: .heavy))
                     .lineLimit(2)
                     .minimumScaleFactor(0.7)
                 MetaPills(title: title)
@@ -156,7 +164,7 @@ struct HomeView: View {
         .frame(height: heroHeight)
     }
 
-    private var heroHeight: CGFloat { sizeClass == .regular ? 560 : 470 }
+    private var heroHeight: CGFloat { layout.heroHeight }
 
     private func playLabel(_ title: CatalogTitle) -> String {
         if model.resumeTarget(for: title) != nil {
@@ -176,7 +184,7 @@ struct HomeView: View {
                         Button {
                             model.play(title: item.title, episode: item.episode)
                         } label: {
-                            ContinueCard(item: item, width: sizeClass == .regular ? 260 : 210)
+                            ContinueCard(item: item, width: layout.continueCardWidth)
                         }
                         .buttonStyle(.plain)
                         .contextMenu {
@@ -201,7 +209,7 @@ struct HomeView: View {
                 titleIDs: model.myList().map(\.id),
                 style: .poster
             ),
-            posterWidth: posterWidth
+            posterWidth: layout.posterWidth
         )
     }
 }
