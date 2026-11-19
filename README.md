@@ -4,6 +4,32 @@
 
 Layl is a native SwiftUI iOS app: a dark, Netflix-style browser for freely licensed films. The interface is Arabic and right-to-left, with an English toggle. Videos stream with AVPlayer. Profiles, My List, and playback progress stay on the device.
 
+## بناء IPA بدون ماك، ثم تثبيته من ويندوز
+
+لا تحتاج إلى جهاز ماك. Codemagic يبني ملفًا **غير موقَّع** على جهاز macOS سحابي، ثم توقّعه أنت على ويندوز ببرنامج Sideloadly وبحساب Apple ID مجاني. التوقيع المجاني ينتهي بعد ٧ أيام، فتعيد الخطوة نفسها كل أسبوع.
+
+رابط استنساخ المستودع (خاص، لذلك Codemagic سيطلب بيانات الدخول):
+
+```text
+https://origin.cursor.com/git/abdullah-al-harthy/tmp-6d77c1239481e944.git
+```
+
+1. أنشئ حسابًا على [codemagic.io](https://codemagic.io).
+2. من صفحة Applications اضغط **Add application**.
+3. اختر **HTTPS/SSH** ثم **Next: Select repository**.
+4. الصق رابط الاستنساخ أعلاه. لا تختر Public repository؛ المستودع خاص.
+5. أدخل اسم مستخدم Origin ورمز الوصول (Personal Access Token) إذا طُلبت كلمة المرور. إن فضّلت SSH، ولّد زوج مفاتيح من Codemagic وأضف المفتاح العام إلى المستودع.
+6. عند اختيار نوع المشروع اختر **iOS / Xcode** وأكّد أن البناء يقرأ `codemagic.yaml`. اسم سير العمل: **Layl unsigned IPA**.
+7. اضغط **Start new build** واختر فرع `main` وسير العمل `ios-unsigned-ipa`.
+8. بعد نجاح البناء افتح **Artifacts** ونزّل `Layl-unsigned.ipa`.
+9. على ويندوز ثبّت [Sideloadly](https://sideloadly.io) ووصّل الآيفون (iOS 17 أو أحدث) ووافق على «الثقة بهذا الكمبيوتر».
+10. على الآيفون فعّل وضع المطوّر: **الإعدادات ← الخصوصية والأمن ← وضع المطوّر**.
+11. في Sideloadly اسحب ملف IPA، وأدخل Apple ID المجاني (مع رمز التحقق بخطوتين إن ظهر)، ثم **Start**. إذا رُفض معرّف الحزمة `com.layl.streaming` فغيّره من خيارات Sideloadly إلى اسم فريد مثل `com.yourname.layl`.
+12. على الآيفون: **الإعدادات ← عام ← VPN وإدارة الجهاز** ثم ثق بشهادة حسابك.
+13. كل ٧ أيام أعد الخطوتين ١١ و١٢ بنفس Apple ID. Sideloadly يوقّع التطبيق من جديد؛ لا تحتاج إلى إعادة بناء IPA ما دام الملف عندك.
+
+إن نسخت المستودع إلى GitHub، فسير العمل `.github/workflows/ios-unsigned-ipa.yml` يبني الملف نفسه على `macos-latest`. بعد اكتمال Actions نزّل artifact باسم `Layl-unsigned-ipa`، ثم أكمل من الخطوة ٩.
+
 ## What you can do
 
 - Choose who’s watching. Profiles are stored locally, including a kids profile that hides horror and other non-family titles.
@@ -53,16 +79,15 @@ xcodebuild -project Layl.xcodeproj -scheme Layl \
 
 If that simulator name is not installed, list devices with `xcrun simctl list devices available` and use one of those names.
 
-## Why this repository does not contain an IPA
+## Unsigned IPA without a Mac
 
-This project was prepared on **Linux**. There is no macOS, no Xcode, no iOS SDK, and no Apple code-signing identity here, so an `.ipa` cannot be compiled or signed in this environment.
+This environment cannot compile iOS apps. `codemagic.yaml` builds an **unsigned** IPA on a Codemagic `mac_mini_m2` runner with the latest Xcode (`CODE_SIGNING_ALLOWED=NO`). The artifact is `build/ipa/Layl-unsigned.ipa`. Sign it on Windows with [Sideloadly](https://sideloadly.io) and a free Apple ID; repeat every 7 days. The Arabic steps above use this clone URL:
 
-An IPA is a signed iOS application bundle. Producing one always requires:
+```text
+https://origin.cursor.com/git/abdullah-al-harthy/tmp-6d77c1239481e944.git
+```
 
-1. A **Mac** with Xcode, because only Apple’s iOS SDK can compile a SwiftUI app into an installable bundle.
-2. An **Apple ID**. A free personal team can install onto your own iPhone for about 7 days. The **Apple Developer Program** (paid) is required for Ad Hoc distribution, TestFlight, and the App Store.
-
-Nothing else was missing: the Xcode project, assets, and export settings are in the repo.
+The repository is private, so Codemagic needs HTTPS credentials or an SSH key. A GitHub mirror can use `.github/workflows/ios-unsigned-ipa.yml` instead. A paid Apple Developer account is only required for Ad Hoc, TestFlight, or the App Store.
 
 ## Install on your iPhone from Xcode (free Apple ID)
 

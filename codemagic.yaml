@@ -1,0 +1,23 @@
+# Unsigned Layl IPA for Sideloadly. No Apple certificate is used on the runner.
+workflows:
+  ios-unsigned-ipa:
+    name: Layl unsigned IPA
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      xcode: latest
+      vars:
+        XCODE_SCHEME: Layl
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+      cancel_previous_builds: true
+    scripts:
+      - name: Build unsigned iOS IPA
+        script: bash scripts/build-unsigned-ipa.sh
+    artifacts:
+      - build/ipa/Layl-unsigned.ipa
