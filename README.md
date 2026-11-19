@@ -47,6 +47,10 @@ Layl can connect to the open [Streaming Availability API](https://github.com/mov
 
 In the app: **Settings** (gear) → paste **API key** → choose **country** and preferred **services**. Data and posters from the API are subject to [their terms](https://developers.movieofthenight.com/terms-and-conditions).
 
+### Any API
+
+Account → Movie and series sources. Add a base URL, movie/series/search/episode paths, auth (none, header, query, or Bearer, stored in the Keychain), and JSON paths for title, poster, stream URL, and the rest. Test connection shows a parsed preview. Direct video URLs (mp4, m3u8, and the like) play in the app. Presets exist for TMDB metadata and the Streaming Availability API.
+
 ### iPhone layout
 
 The UI scales for iPhone mini, standard, Pro, and Pro Max width buckets (including 15/16/17 families). **Settings → Screen density** switches comfortable vs compact spacing.

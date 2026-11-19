@@ -172,6 +172,7 @@ struct SearchView: View {
                 .padding(.horizontal, layout.contentInset)
                 .onChange(of: query) { _, value in
                     model.searchStreaming(query: value)
+                    model.searchSources(value)
                 }
 
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -186,6 +187,13 @@ struct SearchView: View {
 
                 if model.hasStreamingAPI, !query.trimmingCharacters(in: .whitespaces).isEmpty {
                     streamingSection
+                }
+                if !model.sourceSearch.isEmpty {
+                    RemoteRail(
+                        title: model.language.t("مصادرك", "Your sources"),
+                        titles: model.sourceSearch,
+                        posterWidth: layout.posterWidth
+                    )
                 }
 
                 if titles.isEmpty {

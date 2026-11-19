@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum LaylTheme {
-    static let bg = Color(red: 0.071, green: 0.071, blue: 0.071)
+    static let bg = Color.black
     static let elevated = Color(red: 0.12, green: 0.12, blue: 0.12)
     static let red = Color(red: 0.898, green: 0.035, blue: 0.078)
     static let match = Color(red: 0.275, green: 0.827, blue: 0.412)
@@ -43,6 +43,9 @@ extension View {
         }
         .navigationDestination(for: StreamingShow.self) { show in
             StreamingShowDetailView(show: show)
+        }
+        .navigationDestination(for: RemoteTitle.self) { title in
+            RemoteDetailView(title: title)
         }
     }
 }

@@ -17,6 +17,7 @@ struct LaylApp: App {
 struct RootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicType
 
     var body: some View {
         GeometryReader { proxy in
@@ -34,10 +35,12 @@ struct RootView: View {
                 \.laylLayout,
                 LaylLayoutMetrics.current(
                     width: proxy.size.width,
+                    height: proxy.size.height,
                     safeTop: proxy.safeAreaInsets.top,
                     safeBottom: proxy.safeAreaInsets.bottom,
                     horizontalSizeClass: sizeClass,
-                    density: model.contentDensity
+                    density: model.contentDensity,
+                    dynamicTypeSize: dynamicType
                 )
             )
         }

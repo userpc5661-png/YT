@@ -9,10 +9,8 @@ struct ProfilePickerView: View {
 
     private var columns: [GridItem] {
         let minimum: CGFloat = switch layout.phoneClass {
-        case .proMax: 132
-        case .pro, .standard: 120
-        case .mini: 108
-        case .pad: 150
+        case .proMax, .pad: layout.avatarSize
+        case .pro, .standard, .compact, .se: layout.avatarSize
         }
         return [GridItem(.adaptive(minimum: minimum), spacing: 22)]
     }
@@ -91,7 +89,7 @@ struct ProfilePickerView: View {
             }
         } label: {
             VStack(spacing: 10) {
-                ProfileAvatar(profile: profile, selected: false)
+                ProfileAvatar(profile: profile, size: layout.avatarSize, selected: false, rounded: true)
                     .overlay(alignment: .topLeading) {
                         if managing && model.profiles.count > 1 {
                             Image(systemName: "xmark")

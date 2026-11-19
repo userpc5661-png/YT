@@ -2,33 +2,30 @@ import SwiftUI
 
 enum AppSection: String, CaseIterable, Identifiable, Hashable {
     case home
-    case discover
-    case movies
-    case series
+    case fresh
     case myList
     case search
+    case profile
 
     var id: String { rawValue }
 
     func title(_ language: AppLanguage) -> String {
         switch self {
         case .home: return language.t("الرئيسية", "Home")
-        case .discover: return language.t("اكتشف", "Discover")
-        case .movies: return language.t("أفلام", "Movies")
-        case .series: return language.t("مسلسلات", "Series")
+        case .fresh: return language.t("جديد", "New")
         case .myList: return language.t("قائمتي", "My List")
         case .search: return language.t("بحث", "Search")
+        case .profile: return language.t("حسابي", "Account")
         }
     }
 
     var symbol: String {
         switch self {
         case .home: return "house.fill"
-        case .discover: return "sparkles.tv"
-        case .movies: return "film"
-        case .series: return "rectangle.stack"
-        case .myList: return "checkmark.rectangle.stack"
+        case .fresh: return "flame.fill"
+        case .myList: return "plus.rectangle.on.rectangle"
         case .search: return "magnifyingglass"
+        case .profile: return "person.crop.circle"
         }
     }
 }
@@ -59,6 +56,11 @@ struct MainShell: View {
             }
         }
         .fullScreenCover(
+            item: Binding(get: { model.remotePlay }, set: { model.remotePlay = $0 })
+        ) { playback in
+            RemotePlayerScreen(title: playback.title, url: playback.url)
+        }
+        .fullScreenCover(
             item: Binding(
                 get: { model.playRequest },
                 set: { model.playRequest = $0 }
@@ -79,16 +81,14 @@ struct MainShell: View {
                 switch section {
                 case .home:
                     HomeView()
-                case .discover:
+                case .fresh:
                     DiscoverView()
-                case .movies:
-                    BrowseView(mode: .movies)
-                case .series:
-                    BrowseView(mode: .series)
                 case .myList:
                     MyListView()
                 case .search:
                     SearchView()
+                case .profile:
+                    AccountView()
                 }
             }
             .laylDestinations()

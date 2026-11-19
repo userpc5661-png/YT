@@ -23,6 +23,7 @@ struct ProfileAvatar: View {
     let profile: Profile
     var size: CGFloat = 112
     var selected: Bool = false
+    var rounded: Bool = false
 
     var body: some View {
         ZStack {
@@ -34,6 +35,7 @@ struct ProfileAvatar: View {
                 .minimumScaleFactor(0.5)
         }
         .frame(width: size, height: size)
+        .clipShape(rounded ? AnyShape(RoundedRectangle(cornerRadius: size * 0.18, style: .continuous)) : AnyShape(Circle()))
         .overlay(alignment: .bottomTrailing) {
             if profile.isKids {
                 Image(systemName: "star.fill")
@@ -57,7 +59,7 @@ struct PosterCard: View {
     var width: CGFloat = 116
     var rank: Int? = nil
 
-    private var height: CGFloat { width * 1.48 }
+    private var height: CGFloat { width * 1.5 }
 
     var body: some View {
         HStack(alignment: .bottom, spacing: rank == nil ? 0 : -18) {
@@ -176,7 +178,7 @@ struct MediaRail: View {
             .padding(.horizontal, horizontalPadding)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .bottom, spacing: 10) {
+                HStack(alignment: .bottom, spacing: layout.posterGap) {
                     let titles = Catalog.titles(ids: lane.titleIDs).filter(model.isVisible)
                     ForEach(Array(titles.enumerated()), id: \.element.id) { index, title in
                         NavigationLink(value: title) {

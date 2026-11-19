@@ -15,6 +15,11 @@ struct SettingsView: View {
     var body: some View {
         Form {
             SwiftUI.Section {
+                NavigationLink(model.language.t("ربط أي واجهة", "Connect any API")) {
+                    SourceListView()
+                }
+            }
+            SwiftUI.Section {
                 Text(model.language.t(
                     "اربط التطبيق بـ Streaming Availability API لاكتشاف الأفلام والمسلسلات ومعرفة أين تُعرض على نتفليكس وديزني+ وغيرها.",
                     "Connect to the Streaming Availability API to discover titles and see where they stream on Netflix, Disney+, and more."

@@ -22,6 +22,11 @@ final class AppModel {
     var streamingSearchResults: [StreamingShow] = []
     var streamingSearchLoading = false
     var titleStreamingInfo: [String: StreamingShow] = [:]
+    var sources: [ContentSource] = []
+    var sourceRails: [SourceRail] = []
+    var sourceSearch: [RemoteTitle] = []
+    var sourcesLoading = false
+    var remotePlay: RemotePlayback?
 
     private var lists: [String: [String]]
     private var progress: [String: [String: WatchProgress]]
@@ -69,6 +74,91 @@ final class AppModel {
             heroCarouselEnabled = true
             preferredStreamingServices = Set(StreamingServiceChip.featured.map(\.id))
         }
+        loadSources()
+    }
+
+    func loadSources() {
+        guard let data = UserDefaults.standard.data(forKey: "layl.sources.v1"),
+              let saved = try? JSONDecoder().decode([ContentSource].self, from: data) else {
+            sources = []
+            return
+        }
+        sources = saved
+    }
+
+    func saveSources() {
+        if let data = try? JSONEncoder().encode(sources) {
+            UserDefaults.standard.set(data, forKey: "layl.sources.v1")
+        }
+    }
+
+    func upsert(_ source: ContentSource, secret: String?) {
+        if let index = sources.firstIndex(where: { $0.id == source.id }) {
+            sources[index] = source
+        } else {
+            sources.append(source)
+        }
+        if let secret {
+            let trimmed = secret.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.isEmpty {
+                KeychainStore.delete(account: source.id.uuidString)
+            } else {
+                KeychainStore.set(trimmed, account: source.id.uuidString)
+            }
+        }
+        saveSources()
+    }
+
+    func deleteSource(_ source: ContentSource) {
+        sources.removeAll { $0.id == source.id }
+        KeychainStore.delete(account: source.id.uuidString)
+        sourceRails.removeAll { $0.source.id == source.id }
+        saveSources()
+    }
+
+    func reloadSourceRails() {
+        let enabled = sources.filter(\.enabled)
+        guard !enabled.isEmpty else {
+            sourceRails = []
+            return
+        }
+        sourcesLoading = true
+        Task { @MainActor in
+            var rails: [SourceRail] = []
+            for source in enabled {
+                if let titles = try? await SourceClient.load(source, feed: .movies), !titles.isEmpty {
+                    rails.append(SourceRail(source: source, titles: Array(titles.prefix(20))))
+                }
+                if let series = try? await SourceClient.load(source, feed: .series), !series.isEmpty {
+                    rails.append(SourceRail(source: source, titles: Array(series.prefix(20)), series: true))
+                }
+            }
+            sourceRails = rails
+            sourcesLoading = false
+        }
+    }
+
+    func searchSources(_ query: String) {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let enabled = sources.filter(\.enabled)
+        guard trimmed.count >= 2, !enabled.isEmpty else {
+            sourceSearch = []
+            return
+        }
+        Task { @MainActor in
+            var found: [RemoteTitle] = []
+            for source in enabled where !source.searchPath.isEmpty {
+                if let titles = try? await SourceClient.load(source, feed: .search(trimmed)) {
+                    found.append(contentsOf: titles.prefix(12))
+                }
+            }
+            sourceSearch = found
+        }
+    }
+
+    func play(remote title: RemoteTitle) {
+        guard let url = title.streamURL, title.directVideo else { return }
+        remotePlay = RemotePlayback(url: url, title: title.title)
     }
 
     var hasStreamingAPI: Bool {
