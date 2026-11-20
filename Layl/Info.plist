@@ -8,6 +8,13 @@
 	<string>Layl</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>يتصل بسيرفر FaselHD على شبكتك المحلية لتشغيل البث.</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

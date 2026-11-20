@@ -20,6 +20,7 @@
 		00000000A11000000000002D /* JSONPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002C /* JSONPath.swift */; };
 		00000000A11000000000002F /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002E /* KeychainStore.swift */; };
 		00000000A110000000000031 /* SourceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000030 /* SourceClient.swift */; };
+		00000000A110000000000051 /* FaselSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000050 /* FaselSource.swift */; };
 		00000000A110000000000034 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000033 /* Components.swift */; };
 		00000000A110000000000036 /* ProfilePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000035 /* ProfilePickerView.swift */; };
 		00000000A110000000000038 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000037 /* HomeView.swift */; };
@@ -34,6 +35,7 @@
 		00000000A11000000000004A /* SourceViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000049 /* SourceViews.swift */; };
 		00000000A11000000000004C /* LayoutPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004B /* LayoutPreview.swift */; };
 		00000000A11000000000004E /* ClipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004D /* ClipsView.swift */; };
+		00000000A110000000000053 /* FaselView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000052 /* FaselView.swift */; };
 		00000000A110000000000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000012 /* Assets.xcassets */; };
 		00000000A110000000000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000011 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -52,6 +54,7 @@
 		00000000A11000000000002C /* JSONPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONPath.swift; sourceTree = "<group>"; };
 		00000000A11000000000002E /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		00000000A110000000000030 /* SourceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceClient.swift; sourceTree = "<group>"; };
+		00000000A110000000000050 /* FaselSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaselSource.swift; sourceTree = "<group>"; };
 		00000000A110000000000033 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		00000000A110000000000035 /* ProfilePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePickerView.swift; sourceTree = "<group>"; };
 		00000000A110000000000037 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -66,6 +69,7 @@
 		00000000A110000000000049 /* SourceViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViews.swift; sourceTree = "<group>"; };
 		00000000A11000000000004B /* LayoutPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutPreview.swift; sourceTree = "<group>"; };
 		00000000A11000000000004D /* ClipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsView.swift; sourceTree = "<group>"; };
+		00000000A110000000000052 /* FaselView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaselView.swift; sourceTree = "<group>"; };
 		00000000A110000000000010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00000000A110000000000011 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		00000000A110000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -143,6 +147,7 @@
 				00000000A11000000000002C /* JSONPath.swift */,
 				00000000A11000000000002E /* KeychainStore.swift */,
 				00000000A110000000000030 /* SourceClient.swift */,
+				00000000A110000000000050 /* FaselSource.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -164,6 +169,7 @@
 				00000000A110000000000049 /* SourceViews.swift */,
 				00000000A11000000000004B /* LayoutPreview.swift */,
 				00000000A11000000000004D /* ClipsView.swift */,
+				00000000A110000000000052 /* FaselView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -252,6 +258,7 @@
 				00000000A11000000000002D /* JSONPath.swift in Sources */,
 				00000000A11000000000002F /* KeychainStore.swift in Sources */,
 				00000000A110000000000031 /* SourceClient.swift in Sources */,
+				00000000A110000000000051 /* FaselSource.swift in Sources */,
 				00000000A110000000000034 /* Components.swift in Sources */,
 				00000000A110000000000036 /* ProfilePickerView.swift in Sources */,
 				00000000A110000000000038 /* HomeView.swift in Sources */,
@@ -266,6 +273,7 @@
 				00000000A11000000000004A /* SourceViews.swift in Sources */,
 				00000000A11000000000004C /* LayoutPreview.swift in Sources */,
 				00000000A11000000000004E /* ClipsView.swift in Sources */,
+				00000000A110000000000053 /* FaselView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

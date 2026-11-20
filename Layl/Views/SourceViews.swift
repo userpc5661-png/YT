@@ -26,6 +26,9 @@ struct AccountView: View {
                 NavigationLink(model.language.t("مصادر الأفلام والمسلسلات", "Movie and series sources")) {
                     SourceListView()
                 }
+                NavigationLink("FaselHD") {
+                    FaselView()
+                }
                 NavigationLink(model.language.t("الإعدادات", "Settings")) {
                     SettingsView()
                 }
