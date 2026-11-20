@@ -279,6 +279,26 @@ def do_prefetch():
     prefetch(url)
     return jsonify({"status": "fetching"})
 
+@app.route("/debug/stream")
+def debug_stream():
+    """
+    GET /debug/stream?url=<episode_url>
+    runs one scrape and returns every m3u8 it saw, no cache
+    """
+    url = request.args.get("url", "").strip()
+    if not url:
+        return jsonify({"error": "url required"}), 400
+    try:
+        data = _resolver.resolve(url)
+    except Exception as e:
+        return jsonify({"error": str(e), "url": url}), 500
+    return jsonify({
+        "url": url,
+        "master": data.get("master"),
+        "streams": data.get("streams"),
+        "all": data.get("all"),
+    })
+
 # ── Static / UI ─────────────────────────────────────────
 @app.route("/static/<path:filename>")
 def static_files(filename):
