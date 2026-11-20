@@ -1,6 +1,81 @@
 import SwiftUI
 import UIKit
 
+struct RemotePosterImage: View {
+    let urlString: String?
+    var width: CGFloat = 114
+
+    private var height: CGFloat { width * 1.48 }
+
+    var body: some View {
+        Color.clear
+            .overlay { remoteImage }
+            .frame(width: width, height: height)
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+    }
+
+    @ViewBuilder
+    private var remoteImage: some View {
+        if let urlString, let url = URL(string: urlString) {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image.resizable().scaledToFill()
+                case .failure:
+                    placeholder
+                default:
+                    placeholder.overlay { ProgressView().tint(.white) }
+                }
+            }
+        } else {
+            placeholder
+        }
+    }
+
+    private var placeholder: some View {
+        LinearGradient(
+            colors: [Color(red: 0.28, green: 0.05, blue: 0.07), Color(red: 0.08, green: 0.08, blue: 0.08)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+}
+
+struct RemoteBackdropImage: View {
+    let urlString: String?
+    var height: CGFloat = 320
+
+    var body: some View {
+        Color.clear
+            .overlay {
+                if let urlString, let url = URL(string: urlString) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image.resizable().scaledToFill()
+                        default:
+                            placeholder
+                        }
+                    }
+                } else {
+                    placeholder
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: height)
+            .clipped()
+    }
+
+    private var placeholder: some View {
+        LinearGradient(
+            colors: [Color(red: 0.2, green: 0.04, blue: 0.06), LaylTheme.bg],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+}
+
 struct CatalogImage: View {
     let asset: String
 

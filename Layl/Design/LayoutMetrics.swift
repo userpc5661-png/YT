@@ -1,5 +1,19 @@
 import SwiftUI
 
+enum ContentDensity: String, Codable, CaseIterable, Identifiable {
+    case comfortable
+    case compact
+
+    var id: String { rawValue }
+
+    func title(_ language: AppLanguage) -> String {
+        switch self {
+        case .comfortable: return language.t("مريح", "Comfortable")
+        case .compact: return language.t("مضغوط", "Compact")
+        }
+    }
+}
+
 /// Portrait width classes from iPhone SE (320) through 17 Pro Max (440) and iPad.
 enum LaylPhoneClass: String, Codable {
     case se
