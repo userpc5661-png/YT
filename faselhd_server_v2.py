@@ -2,9 +2,10 @@
 # pip install flask
 # python faselhd_server_v2.py
 
-import json, re, os, time, threading, subprocess, sys
+import json, re, os, time, threading
 from collections import Counter
 from flask import Flask, jsonify, request, send_from_directory
+from faselhd_stream_api import Resolver
 
 app = Flask(__name__)
 
@@ -85,29 +86,27 @@ def cache_set(url: str, master: str):
         _cache[url] = {"master": master, "expires": time.time() + CACHE_TTL}
 
 # ── Stream Worker ───────────────────────────────────────
-# prefetch queue: set of URLs being fetched right now
-_fetching: set = set()
+# one Chromium for the whole process; _fetching dedupes in-flight scrapes
+_resolver = Resolver()
+_fetching: dict = {}
 _fetching_lock = threading.Lock()
 
 def fetch_stream_sync(url: str) -> str | None:
-    """يشغّل faselhd_stream_api.py ويرجع الـ master m3u8 أو None"""
+    """returns the master m3u8 for an episode page, or None"""
     try:
-        result = subprocess.run(
-            [sys.executable, "faselhd_stream_api.py", url],
-            capture_output=True, text=True, timeout=60
-        )
-        data = json.loads(result.stdout)
+        data = _resolver.resolve(url)
         return data.get("master")
     except Exception as e:
         print(f"[stream error] {e}")
         return None
 
 def prefetch(url: str):
-    """يجيب الـ stream في background ويحطه في الـ cache"""
+    """fetch in background and park it in the cache"""
     with _fetching_lock:
         if url in _fetching:
             return
-        _fetching.add(url)
+        event = threading.Event()
+        _fetching[url] = event
 
     def worker():
         try:
@@ -117,9 +116,17 @@ def prefetch(url: str):
                 print(f"[cache] stored: {url[:60]}...")
         finally:
             with _fetching_lock:
-                _fetching.discard(url)
+                _fetching.pop(url, None)
+            event.set()
 
     threading.Thread(target=worker, daemon=True).start()
+
+def wait_inflight(url: str, timeout: float = 75):
+    """join a running scrape instead of starting a second browser tab"""
+    with _fetching_lock:
+        event = _fetching.get(url)
+    if event is not None:
+        event.wait(timeout)
 
 # ── Routes ──────────────────────────────────────────────
 
@@ -234,10 +241,21 @@ def get_stream():
         from flask import redirect
         return redirect(cached, code=302)
 
-    # مو في الـ cache — جيبه الحين (synchronous)
-    master = fetch_stream_sync(url)
+    # join a prefetch already in flight, then re-check the cache
+    wait_inflight(url)
+    cached = cache_get(url)
+    if cached:
+        accept = request.headers.get("Accept", "")
+        if "application/json" in accept:
+            return jsonify({"master": cached, "source": "prefetched"})
+        from flask import redirect
+        return redirect(cached, code=302)
+
+    # no cache: one shared scrape for every caller of this URL
+    prefetch(url)
+    wait_inflight(url)
+    master = cache_get(url)
     if master:
-        cache_set(url, master)
         accept = request.headers.get("Accept", "")
         if "application/json" in accept:
             return jsonify({"master": master, "source": "live"})
