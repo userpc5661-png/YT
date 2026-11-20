@@ -16,20 +16,22 @@ struct HomeView: View {
 
     var body: some View {
         let featured = filteredFeatured
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             chipRow
             ScrollView {
                 VStack(alignment: .leading, spacing: layout.rowSpacing) {
-                    if !featured.isEmpty {
+                    if chip == .anime && !model.kidsOnly, let anime = model.tmdb.anime.first {
+                        animeHero(anime)
+                    } else if !featured.isEmpty {
                         hero(featured)
                     }
-                    if !model.continueWatching().isEmpty {
+                    if chip != .anime && !model.continueWatching().isEmpty {
                         continueRail
                     }
-                    if !model.myList().isEmpty {
+                    if chip != .anime && !model.myList().isEmpty {
                         myListRail
                     }
-                    if !model.kidsOnly {
+                    if !model.kidsOnly && chip != .categories {
                         tmdbCatalogSection
                     }
                     if chip == .series {
@@ -38,6 +40,8 @@ struct HomeView: View {
                         moviesRail
                     } else if chip == .fresh {
                         newestRail
+                    } else if chip == .anime {
+                        EmptyView()
                     } else if let homeGenre {
                         genreRail(homeGenre)
                     } else {
@@ -47,26 +51,33 @@ struct HomeView: View {
                             MediaRail(lane: lane, posterWidth: layout.posterWidth)
                         }
                     }
-                    if !model.kidsOnly { sourceRails }
+                    if !model.kidsOnly && chip != .anime { sourceRails }
                 }
                 .laylHugsWidth()
                 .padding(.bottom, 28)
             }
+            .refreshable {
+                if !model.kidsOnly {
+                    await model.tmdb.refreshHomeCatalog(language: model.tmdbLanguage)
+                    model.reloadSourceRails()
+                }
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .clipped()
-        .background { ambient }
+        .background(LaylTheme.bg.ignoresSafeArea())
         .toolbar { homeToolbar }
         .toolbarColorScheme(.dark, for: .navigationBar)
         .laylNavigationChrome()
         .onAppear {
             if !model.kidsOnly {
                 model.reloadSourceRails()
-                model.tmdb.loadTrending(language: model.tmdbLanguage)
+                model.tmdb.loadHomeCatalog(language: model.tmdbLanguage)
             }
         }
         .onChange(of: model.tmdbLanguage) { _, language in
-            model.tmdb.loadTrending(language: language, forceRefresh: true)
+            guard !model.kidsOnly else { return }
+            model.tmdb.loadHomeCatalog(language: language, forceRefresh: true)
         }
         .sheet(isPresented: $showGenres) { genreSheet }
         .sheet(isPresented: $showCast) { castSheet }
@@ -80,9 +91,11 @@ struct HomeView: View {
         }
         .onChange(of: model.activeProfileID) { _, _ in
             featuredIndex = 0
+            chip = .home
+            homeGenre = nil
             if !model.kidsOnly {
                 model.reloadSourceRails()
-                model.tmdb.loadTrending(language: model.tmdbLanguage)
+                model.tmdb.loadHomeCatalog(language: model.tmdbLanguage)
             } else {
                 model.sourceRails = []
             }
@@ -104,6 +117,8 @@ struct HomeView: View {
             return Catalog.all.filter { $0.kind == .series && model.isVisible($0) }
         case .movies:
             return base.filter { $0.kind == .movie }
+        case .anime:
+            return []
         case .fresh:
             return Catalog.all.filter(model.isVisible).sorted { $0.year > $1.year }
         case .home, .categories:
@@ -111,45 +126,12 @@ struct HomeView: View {
         }
     }
 
-    private var ambientAsset: String {
-        let featured = filteredFeatured
-        guard !featured.isEmpty else { return "backdrop_sintel" }
-        let index = min(max(featuredIndex, 0), featured.count - 1)
-        return featured[index].backdropAsset
-    }
-
-    private var ambient: some View {
-        let asset = ambientAsset
-        let tone = ArtworkTone.color(asset: asset)
-        return ZStack {
-            tone
-            CatalogImage(asset: asset)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .blur(radius: 28)
-                .opacity(0.45)
-            LinearGradient(colors: [tone.opacity(0.15), .black.opacity(0.9)], startPoint: .top, endPoint: .bottom)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .clipped()
-        .ignoresSafeArea()
-        .animation(.easeInOut(duration: 0.45), value: asset)
-    }
-
     @ToolbarContentBuilder
     private var homeToolbar: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            HStack(spacing: 8) {
-                Image("BrandMark")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 26, height: 26)
-                    .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-                Text(model.language.t("الرئيسية", "Home"))
-                    .font(.headline.weight(.bold))
-                    .lineLimit(1)
-            }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("Layl")
+            BrandLockup(mark: 27)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Layl")
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
             Button { showCast = true } label: { Image(systemName: "airplayvideo") }
@@ -163,28 +145,32 @@ struct HomeView: View {
 
     private var chipRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            LaylGlassGroup(spacing: 8) {
-                HStack(spacing: 8) {
-                    chipButton(.series, model.language.t("مسلسلات", "Series"))
-                    chipButton(.movies, model.language.t("أفلام", "Films"))
-                    chipButton(.fresh, model.language.t("جديد ورائج", "New & hot"))
-                    Button {
-                        showGenres = true
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(homeGenre?.title(model.language) ?? model.language.t("التصنيفات", "Categories"))
-                                .lineLimit(1)
-                            Image(systemName: "chevron.down").font(.caption2.weight(.bold))
-                        }
-                        .font(.subheadline.weight(.semibold))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .modifier(LaylChipGlass(active: true))
-                    }
-                    .buttonStyle(.plain)
+            HStack(spacing: 8) {
+                chipButton(.home, model.language.t("الرئيسية", "Home"))
+                chipButton(.series, model.language.t("مسلسلات", "Series"))
+                chipButton(.movies, model.language.t("أفلام", "Films"))
+                if !model.kidsOnly {
+                    chipButton(.anime, model.language.t("أنمي", "Anime"))
                 }
-                .padding(.horizontal, sideInset)
+                chipButton(.fresh, model.language.t("جديد ورائج", "New & hot"))
+                Button {
+                    showGenres = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(homeGenre?.title(model.language) ?? model.language.t("التصنيفات", "Categories"))
+                            .lineLimit(1)
+                        Image(systemName: "chevron.down").font(.caption2.weight(.bold))
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .foregroundStyle(.white)
+                    .background(Color.white.opacity(0.08), in: Capsule())
+                    .overlay(Capsule().stroke(Color.white.opacity(0.16), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
             }
+            .padding(.horizontal, sideInset)
         }
         .laylHugsWidth()
     }
@@ -194,6 +180,7 @@ struct HomeView: View {
         return Button {
             withAnimation(.easeInOut(duration: 0.2)) {
                 chip = selected ? .home : value
+                featuredIndex = 0
                 if value != .categories { homeGenre = nil }
             }
         } label: {
@@ -202,13 +189,15 @@ struct HomeView: View {
                 .lineLimit(1)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
-                .foregroundStyle(selected ? Color.black : Color.white)
+                .foregroundStyle(.white)
                 .background {
                     if selected {
-                        Capsule().fill(Color.white)
+                        Capsule().fill(LaylTheme.red)
+                    } else {
+                        Capsule().fill(Color.white.opacity(0.08))
                     }
                 }
-                .modifier(LaylChipGlass(active: !selected))
+                .overlay(Capsule().stroke(Color.white.opacity(selected ? 0 : 0.16), lineWidth: 1))
         }
         .buttonStyle(.plain)
     }
@@ -252,7 +241,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(model.language.t("اكتشف أعمالًا من العالم", "Discover titles worldwide"))
+                    Text(model.language.t("اكتشف أفلامًا ومسلسلات وأنمي", "Discover films, series & anime"))
                         .font(.title3.weight(.bold))
                     Text(model.language.t("بيانات وصور من TMDB · لا تشمل تشغيل الفيديو", "TMDB metadata and artwork · not video playback"))
                         .font(.caption2)
@@ -280,22 +269,82 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(LaylTheme.elevated, in: RoundedRectangle(cornerRadius: 12))
                 .padding(.horizontal, sideInset)
-            } else if model.tmdb.isLoading && model.tmdb.trending.isEmpty {
+            } else if model.tmdb.isLoadingHome && model.tmdb.trending.isEmpty && model.tmdb.movies.isEmpty && model.tmdb.series.isEmpty && model.tmdb.anime.isEmpty {
                 ProgressView(model.language.t("نجلب الرائج عالميًا...", "Loading worldwide trends..."))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 24)
-            } else if !model.tmdb.trending.isEmpty {
-                TMDBRail(
-                    title: model.language.t("الرائج عالميًا", "Trending worldwide"),
-                    items: model.tmdb.trending,
-                    posterWidth: layout.posterWidth
-                )
-                TMDBAttributionFooter()
+            } else {
+                if model.tmdb.homeWarning {
+                    HStack(spacing: 10) {
+                        Label(
+                            model.language.t("بعض الأقسام لم تُحمّل", "Some catalog sections did not load"),
+                            systemImage: "exclamationmark.triangle"
+                        )
+                        .font(.caption)
+                        .foregroundStyle(LaylTheme.muted)
+                        Spacer(minLength: 4)
+                        retryCatalogButton
+                    }
                     .padding(.horizontal, sideInset)
-            } else if let error = model.tmdb.error {
-                Text(error)
-                    .font(.footnote)
-                    .foregroundStyle(LaylTheme.muted)
+                }
+                if chip == .anime {
+                    Text(model.language.t("تُستخرج النتائج من تصنيف الرسوم المتحركة واللغة اليابانية؛ وصف الأنمي تقريبي.", "Results use animation and Japanese-language filters; the anime label is approximate."))
+                        .font(.caption2)
+                        .foregroundStyle(LaylTheme.muted)
+                        .padding(.horizontal, sideInset)
+                    if model.tmdb.anime.isEmpty && model.tmdb.isLoadingHome {
+                        ProgressView(model.language.t("نجلب الأنمي...", "Loading anime..."))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 24)
+                    } else if model.tmdb.anime.isEmpty {
+                        VStack(spacing: 12) {
+                            EmptyState(
+                                systemImage: "sparkles",
+                                title: model.language.t("لا توجد نتائج أنمي الآن", "No anime results right now"),
+                                message: model.tmdb.homeError ?? model.language.t("تحقق من الاتصال أو جرّب لاحقًا.", "Check your connection or try again later.")
+                            )
+                            retryCatalogButton
+                        }
+                        .padding(.horizontal, sideInset)
+                    } else {
+                        TMDBRail(
+                            title: model.language.t("أنمي ياباني رائج", "Popular Japanese anime"),
+                            items: model.tmdb.anime,
+                            posterWidth: layout.posterWidth
+                        )
+                    }
+                } else if chip == .movies {
+                    tmdbCategoryContent(
+                        title: model.language.t("أفلام رائجة", "Popular films"),
+                        emptyTitle: model.language.t("لا توجد أفلام الآن", "No films available right now"),
+                        items: model.tmdb.movies
+                    )
+                } else if chip == .series {
+                    tmdbCategoryContent(
+                        title: model.language.t("مسلسلات رائجة", "Popular series"),
+                        emptyTitle: model.language.t("لا توجد مسلسلات الآن", "No series available right now"),
+                        items: model.tmdb.series
+                    )
+                } else if chip == .fresh {
+                    tmdbCategoryContent(
+                        title: model.language.t("الرائج عالميًا", "Trending worldwide"),
+                        emptyTitle: model.language.t("لا توجد أعمال رائجة الآن", "No trending titles right now"),
+                        items: model.tmdb.trending
+                    )
+                } else if chip == .home {
+                    tmdbCategoryContent(
+                        title: model.language.t("الرائج عالميًا", "Trending worldwide"),
+                        emptyTitle: model.language.t("لا توجد أعمال رائجة الآن", "No trending titles right now"),
+                        items: model.tmdb.trending
+                    )
+                } else {
+                    TMDBRail(
+                        title: model.language.t("الرائج عالميًا", "Trending worldwide"),
+                        items: model.tmdb.trending,
+                        posterWidth: layout.posterWidth
+                    )
+                }
+                TMDBAttributionFooter()
                     .padding(.horizontal, sideInset)
             }
         }
@@ -308,6 +357,40 @@ struct HomeView: View {
             lane: Lane(id: "movies-home", title: L10n(ar: "أفلام", en: "Films"), titleIDs: ids, style: .poster),
             posterWidth: layout.posterWidth
         )
+    }
+
+    @ViewBuilder
+    private func tmdbCategoryContent(title: String, emptyTitle: String, items: [TMDBTitle]) -> some View {
+        if items.isEmpty {
+            if model.tmdb.isLoadingHome {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 24)
+            } else {
+                VStack(spacing: 12) {
+                    EmptyState(
+                        systemImage: "film",
+                        title: emptyTitle,
+                        message: model.tmdb.homeError ?? model.language.t("لا تتوفر نتائج لهذه الفئة الآن. تحقق من الاتصال أو جرّب لاحقًا.", "No results are available for this category. Check your connection or try again later.")
+                    )
+                    retryCatalogButton
+                }
+                .padding(.horizontal, sideInset)
+            }
+        } else {
+            TMDBRail(title: title, items: items, posterWidth: layout.posterWidth)
+        }
+    }
+
+    private var retryCatalogButton: some View {
+        Button {
+            model.tmdb.loadHomeCatalog(language: model.tmdbLanguage, forceRefresh: true)
+        } label: {
+            Label(model.language.t("إعادة المحاولة", "Retry"), systemImage: "arrow.clockwise")
+                .font(.caption.weight(.bold))
+        }
+        .buttonStyle(.bordered)
+        .tint(LaylTheme.red)
     }
 
     private var onlyOnRail: some View {
@@ -348,31 +431,36 @@ struct HomeView: View {
     private func hero(_ featured: [CatalogTitle]) -> some View {
         let index = min(featuredIndex, max(featured.count - 1, 0))
         let title = featured[index]
-        let imageHeight = min(heroHeight * 0.72, 340)
-        return VStack(spacing: 10) {
-            ZStack(alignment: .bottom) {
+        let imageHeight = min(max(heroHeight * 0.94, 300), 410)
+        return VStack(spacing: 8) {
+            ZStack(alignment: .bottomLeading) {
                 CatalogImage(asset: title.backdropAsset)
                     .frame(maxWidth: .infinity)
                     .frame(height: imageHeight)
-                    .overlay(alignment: .bottom) {
-                        LinearGradient(colors: [.clear, .black.opacity(0.88)], startPoint: .center, endPoint: .bottom)
-                            .frame(height: imageHeight * 0.72)
-                            .allowsHitTesting(false)
-                    }
                     .clipped()
-                VStack(spacing: 10) {
+                LinearGradient(colors: [.clear, .black.opacity(0.92)], startPoint: .center, endPoint: .bottom)
+                    .allowsHitTesting(false)
+                LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .center)
+                    .allowsHitTesting(false)
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(model.language.t("اختيار الليلة", "Tonight's pick"))
+                        .font(.caption.weight(.bold))
+                        .textCase(.uppercase)
+                        .tracking(1.2)
+                        .foregroundStyle(.white.opacity(0.8))
                     Text(title.title.text(model.language))
-                        .font(.system(size: min(layout.heroTitleSize, 34), weight: .black))
-                        .multilineTextAlignment(.center)
+                        .font(.system(size: min(layout.heroTitleSize * 0.9, 42), weight: .black))
+                        .multilineTextAlignment(.leading)
                         .lineLimit(2)
                         .minimumScaleFactor(0.6)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    MetaPills(title: title)
                     Text(title.genres.prefix(3).map { $0.title(model.language) }.joined(separator: " · "))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.9))
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     HStack(spacing: 8) {
                         Button {
                             model.play(title: title)
@@ -389,22 +477,21 @@ struct HomeView: View {
                         .buttonStyle(.plain)
                         .frame(maxWidth: .infinity)
                         myListButton(title)
+                        Button { model.detailTitle = title } label: {
+                            Image(systemName: "info.circle")
+                                .font(.headline.weight(.bold))
+                                .frame(width: 46, height: 44)
+                                .background(Color.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(model.language.t("التفاصيل", "Details"))
                     }
-                    Button {
-                        model.detailTitle = title
-                    } label: {
-                        Text(model.language.t("التفاصيل", "Details"))
-                            .font(.caption.weight(.semibold))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.plain)
                 }
-                .padding(16)
+                .padding(.horizontal, sideInset)
+                .padding(.bottom, 24)
                 .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity)
-            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .padding(.horizontal, sideInset)
             HStack(spacing: 6) {
                 ForEach(0..<featured.count, id: \.self) { dot in
                     Capsule()
@@ -420,6 +507,50 @@ struct HomeView: View {
         .laylHugsWidth()
     }
 
+    private func animeHero(_ title: TMDBTitle) -> some View {
+        let imageHeight = min(max(heroHeight * 0.94, 280), 390)
+        return ZStack(alignment: .bottomLeading) {
+            RemoteBackdropImage(urlString: title.backdropURL?.absoluteString, height: imageHeight)
+            LinearGradient(colors: [.clear, .black.opacity(0.94)], startPoint: .center, endPoint: .bottom)
+            LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .center)
+            VStack(alignment: .leading, spacing: 10) {
+                Text(model.language.t("أنمي يستحق الاكتشاف", "Anime to discover"))
+                    .font(.caption.weight(.bold))
+                    .textCase(.uppercase)
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.8))
+                Text(title.title)
+                    .font(.system(size: min(layout.heroTitleSize * 0.9, 40), weight: .black))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.65)
+                HStack(spacing: 8) {
+                    if let year = title.year { Text(year) }
+                    if let rating = title.voteAverage, rating > 0 {
+                        Label(String(format: "%.1f", rating), systemImage: "star.fill")
+                    }
+                    Text(model.language.t("أنمي · معلومات فقط", "Anime · details only"))
+                }
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.88))
+                NavigationLink(value: title) {
+                    Label(model.language.t("التفاصيل", "Details"), systemImage: "info.circle")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 11)
+                        .background(Color.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, sideInset)
+            .padding(.bottom, 24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: imageHeight)
+        .clipped()
+    }
+
     @ViewBuilder
     private func myListButton(_ title: CatalogTitle) -> some View {
         let label = Label(
@@ -431,17 +562,11 @@ struct HomeView: View {
         .minimumScaleFactor(0.7)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
-        if #available(iOS 26, *) {
-            Button { model.toggleSaved(title.id) } label: { label }
-                .buttonStyle(.glass)
-                .frame(maxWidth: .infinity)
-        } else {
-            Button { model.toggleSaved(title.id) } label: {
-                label.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-            }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity)
+        Button { model.toggleSaved(title.id) } label: {
+            label.background(Color.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
     }
 
     private var newestRail: some View {
@@ -567,6 +692,7 @@ enum HomeChip {
     case home
     case series
     case movies
+    case anime
     case fresh
     case categories
 }

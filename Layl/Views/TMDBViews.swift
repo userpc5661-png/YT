@@ -155,33 +155,61 @@ struct DiscoverView: View {
                     .padding(.horizontal, layout.contentInset)
                 } else if !model.tmdb.isConfigured {
                     setupCard
-                } else if model.tmdb.isLoading && globalTitles.isEmpty {
+                } else if model.tmdb.isLoadingHome && globalTitles.isEmpty && model.tmdb.movies.isEmpty && model.tmdb.series.isEmpty && model.tmdb.anime.isEmpty {
                     ProgressView(model.language.t("نجلب الرائج عالميًا...", "Loading worldwide trends..."))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 48)
-                } else if globalTitles.isEmpty {
-                    EmptyState(
-                        systemImage: "wifi.exclamationmark",
-                        title: model.language.t("تعذر تحميل الكتالوج", "Could not load the catalog"),
-                        message: model.tmdb.error ?? model.language.t("تحقق من الاتصال أو رمز TMDB.", "Check your connection or TMDB token.")
-                    )
+                } else if globalTitles.isEmpty && model.tmdb.movies.isEmpty && model.tmdb.series.isEmpty && model.tmdb.anime.isEmpty {
+                    VStack(spacing: 12) {
+                        EmptyState(
+                            systemImage: "wifi.exclamationmark",
+                            title: model.language.t("تعذر تحميل الكتالوج", "Could not load the catalog"),
+                            message: model.tmdb.homeError ?? model.tmdb.error ?? model.language.t("تحقق من الاتصال أو رمز TMDB.", "Check your connection or TMDB token.")
+                        )
+                        retryButton
+                    }
                     .padding(.horizontal, layout.contentInset)
                 } else {
+                    if model.tmdb.homeWarning {
+                        HStack(spacing: 10) {
+                            Label(
+                                model.language.t("بعض الأقسام لم تُحمّل", "Some catalog sections did not load"),
+                                systemImage: "exclamationmark.triangle"
+                            )
+                            .font(.caption)
+                            .foregroundStyle(LaylTheme.muted)
+                            Spacer(minLength: 4)
+                            retryButton
+                        }
+                        .padding(.horizontal, layout.contentInset)
+                    }
                     TMDBRail(
                         title: model.language.t("الرائج عالميًا", "Trending worldwide"),
                         items: globalTitles,
                         posterWidth: layout.posterWidth
                     )
                     TMDBRail(
-                        title: model.language.t("أفلام رائجة عالميًا", "Trending movies worldwide"),
-                        items: globalTitles.filter { $0.kind == "movie" },
+                        title: model.language.t("أفلام رائجة", "Popular films"),
+                        items: model.tmdb.movies,
                         posterWidth: layout.posterWidth
                     )
                     TMDBRail(
-                        title: model.language.t("مسلسلات رائجة عالميًا", "Trending TV worldwide"),
-                        items: globalTitles.filter { $0.kind == "tv" },
+                        title: model.language.t("مسلسلات رائجة", "Popular series"),
+                        items: model.tmdb.series,
                         posterWidth: layout.posterWidth
                     )
+                    TMDBRail(
+                        title: model.language.t("أنمي ورسوم يابانية رائجة", "Popular anime & Japanese animation"),
+                        items: model.tmdb.anime,
+                        posterWidth: layout.posterWidth
+                    )
+                    Text(model.language.t(
+                        "يُقدّر تصنيف الأنمي باستخدام نوع الرسوم المتحركة واللغة اليابانية، وقد لا يشمل كل الأعمال.",
+                        "Anime is approximated using the animation genre and Japanese language, so some titles may be missed."
+                    ))
+                    .font(.caption2)
+                    .foregroundStyle(LaylTheme.muted)
+                    .padding(.horizontal, layout.contentInset)
                     TMDBAttributionFooter()
                         .padding(.horizontal, layout.contentInset)
                 }
@@ -193,17 +221,27 @@ struct DiscoverView: View {
         .navigationTitle(model.language.t("اكتشف عالميًا", "Worldwide"))
         .navigationBarTitleDisplayMode(.large)
         .laylNavigationChrome()
-        .refreshable { await model.tmdb.refreshTrending(language: model.tmdbLanguage) }
-        .onAppear { model.tmdb.loadTrending(language: model.tmdbLanguage) }
+        .refreshable {
+            if !model.kidsOnly {
+                await model.tmdb.refreshHomeCatalog(language: model.tmdbLanguage)
+            }
+        }
+        .onAppear {
+            if !model.kidsOnly {
+                model.tmdb.loadHomeCatalog(language: model.tmdbLanguage)
+            }
+        }
         .onChange(of: model.tmdbLanguage) { _, language in
-            model.tmdb.loadTrending(language: language, forceRefresh: true)
+            if !model.kidsOnly {
+                model.tmdb.loadHomeCatalog(language: language, forceRefresh: true)
+            }
         }
     }
 
     private var header: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(model.language.t("أفلام ومسلسلات من أنحاء العالم", "Movies and TV from around the world"))
+                Text(model.language.t("أفلام ومسلسلات وأنمي من العالم", "Films, series & anime from around the world"))
                     .font(.headline)
                 Text(model.language.t("بيانات وصور من TMDB · لا تشمل تشغيل الفيديو", "Metadata and artwork by TMDB · no video playback"))
                     .font(.caption)
@@ -222,13 +260,24 @@ struct DiscoverView: View {
         .padding(.horizontal, layout.contentInset)
     }
 
+    private var retryButton: some View {
+        Button {
+            model.tmdb.loadHomeCatalog(language: model.tmdbLanguage, forceRefresh: true)
+        } label: {
+            Label(model.language.t("إعادة المحاولة", "Retry"), systemImage: "arrow.clockwise")
+                .font(.caption.weight(.bold))
+        }
+        .buttonStyle(.bordered)
+        .tint(LaylTheme.red)
+    }
+
     private var setupCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(model.language.t("فعّل الكتالوج العالمي المجاني", "Enable the free global catalog"))
                 .font(.title3.weight(.bold))
             Text(model.language.t(
-                "أنشئ رمز API Read Access Token مجانيًا من TMDB للحسابات غير التجارية، ثم أضفه في الإعدادات. هذا الرمز يجلب بيانات الأفلام والمسلسلات فقط.",
-                "Create a free TMDB API Read Access Token for non-commercial use, then add it in Settings. The API provides title data only."
+                "أنشئ رمز API Read Access Token مجانيًا من TMDB للاستخدام غير التجاري، ثم أضفه في الإعدادات. نستخدمه لبيانات الأفلام والمسلسلات والأنمي وصورها فقط.",
+                "Create a free TMDB API Read Access Token for non-commercial use, then add it in Settings. It provides movie, TV and anime metadata and artwork only."
             ))
             .font(.subheadline)
             .foregroundStyle(LaylTheme.muted)
@@ -253,6 +302,9 @@ struct TMDBDetailView: View {
 
     @Environment(AppModel.self) private var model
     @Environment(\.laylLayout) private var layout
+    @State private var details: TMDBTitleDetails?
+    @State private var isLoadingDetails = false
+    @State private var detailsError: String?
 
     var body: some View {
         ScrollView {
@@ -277,6 +329,53 @@ struct TMDBDetailView: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(LaylTheme.muted)
 
+                    if isLoadingDetails && details == nil {
+                        ProgressView(model.language.t("نحمّل التفاصيل...", "Loading title details..."))
+                            .tint(.white)
+                    }
+                    if let detailsError {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(detailsError)
+                                .font(.footnote)
+                                .foregroundStyle(LaylTheme.muted)
+                            Button {
+                                Task { await loadDetails() }
+                            } label: {
+                                Label(model.language.t("إعادة المحاولة", "Retry"), systemImage: "arrow.clockwise")
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(LaylTheme.red)
+                        }
+                    }
+                    if let details {
+                        if let tagline = details.tagline, !tagline.isEmpty {
+                            Text(tagline)
+                                .font(.subheadline.italic())
+                                .foregroundStyle(LaylTheme.muted)
+                        }
+                        if !details.genres.isEmpty {
+                            labeled(
+                                model.language.t("التصنيفات", "Genres"),
+                                details.genres.map(\.name).joined(separator: " · ")
+                            )
+                        }
+                        if let minutes = details.episodeLength {
+                            labeled(
+                                title.kind == "tv"
+                                    ? model.language.t("مدة الحلقة", "Episode length")
+                                    : model.language.t("المدة", "Runtime"),
+                                durationText(minutes)
+                            )
+                        }
+                        if title.kind == "tv", (details.numberOfSeasons != nil || details.numberOfEpisodes != nil) {
+                            let seasons = details.numberOfSeasons.map { model.language.t("\($0) موسم", "\($0) seasons") }
+                            let episodes = details.numberOfEpisodes.map { model.language.t("\($0) حلقة", "\($0) episodes") }
+                            labeled(
+                                model.language.t("المواسم والحلقات", "Seasons & episodes"),
+                                [seasons, episodes].compactMap { $0 }.joined(separator: " · ")
+                            )
+                        }
+                    }
                     if let original = title.originalTitle {
                         labeled(model.language.t("العنوان الأصلي", "Original title"), original)
                     }
@@ -309,6 +408,7 @@ struct TMDBDetailView: View {
         .laylScreen()
         .navigationBarTitleDisplayMode(.inline)
         .laylNavigationChrome()
+        .task(id: "\(title.id)-\(model.tmdbLanguage)") { await loadDetails() }
     }
 
     private var backdrop: some View {
@@ -335,6 +435,33 @@ struct TMDBDetailView: View {
             Text(value)
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func durationText(_ minutes: Int) -> String {
+        let hours = minutes / 60
+        let remainingMinutes = minutes % 60
+        if hours == 0 {
+            return model.language.t("\(minutes) دقيقة", "\(minutes) min")
+        }
+        if remainingMinutes == 0 {
+            return model.language.t("\(hours) ساعة", "\(hours) hr")
+        }
+        return model.language.t("\(hours) س و\(remainingMinutes) د", "\(hours) hr \(remainingMinutes) min")
+    }
+
+    private func loadDetails() async {
+        guard model.tmdb.isConfigured else { return }
+        isLoadingDetails = true
+        detailsError = nil
+        defer { isLoadingDetails = false }
+        do {
+            let response = try await model.tmdb.titleDetails(for: title, language: model.tmdbLanguage)
+            guard !Task.isCancelled else { return }
+            details = response
+        } catch {
+            guard !Task.isCancelled else { return }
+            detailsError = error.localizedDescription
         }
     }
 }

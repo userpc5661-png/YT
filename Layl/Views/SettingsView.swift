@@ -13,8 +13,8 @@ struct SettingsView: View {
         Form {
             SwiftUI.Section {
                 Text(model.language.t(
-                    "أضف رمز TMDB المجاني للبحث في كتالوج عالمي للأفلام والمسلسلات. البيانات والصور فقط؛ الرمز لا يفتح بث الفيديو.",
-                    "Add a free TMDB token to search a worldwide movie and TV catalog. It provides data and artwork only, not video streams."
+                    "أضف رمز TMDB المجاني لاستكشاف الأفلام والمسلسلات والأنمي. البيانات والصور فقط؛ الرمز لا يفتح بث الفيديو.",
+                    "Add a free TMDB token to explore films, series, and anime. It provides data and artwork only, not video streams."
                 ))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -65,7 +65,7 @@ struct SettingsView: View {
                     model.tmdb.updateAccessToken(tmdbToken)
                     model.updatePreferences(density: density, heroCarousel: heroCarousel)
                     if model.tmdb.isConfigured {
-                        model.tmdb.loadTrending(language: model.tmdbLanguage, forceRefresh: true)
+                        model.tmdb.loadHomeCatalog(language: model.tmdbLanguage, forceRefresh: true)
                     }
                     dismiss()
                 }
