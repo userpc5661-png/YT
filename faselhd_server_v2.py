@@ -39,11 +39,32 @@ JUNK_PREFIX = re.compile(
     r'خيال علمي|جريمة|رعب|غموض|وثائقي|تاريخي)*\s*'
 )
 
+NOISE_GLUED = (
+    "1080p", "720p", "480p", "WEB-DL", "WEBRip", "Bluray", "HDRip",
+    "DVDRip", "CAM", "4K", "HD", "Animation", "WEB", "غير معروف", "حلقة",
+    "الأكشن", "الإثارة", "الكوميديا", "الرعب", "الخيال", "العلمي", "الدراما",
+    "الجريمة", "الرومانسية", "الوثائقي", "المغامرة", "الأنيمي", "الغموض",
+    "الحروب", "التاريخي", "العائلي", "الموسيقى", "الرياضة", "السيرة", "الذاتية",
+    "أكشن", "اثارة", "إثارة", "اكشن", "رومانسي", "كوميدي", "دراما", "خيال",
+    "علمي", "جريمة", "رعب", "غموض", "وثائقي", "تاريخي", "انيمي", "شونين",
+    "قوى", "خارقة", "مغامرات", "أنمي", "N/A",
+)
+
 def clean(title: str) -> str:
     m = re.search(r'(فيلم|مسلسل|انمي)\s', title)
     if m:
         title = title[m.start():]
     title = JUNK_PREFIX.sub('', title)
+    # card text glues quality, genre, count and title together with no spaces
+    for _ in range(12):
+        before = title
+        for w in NOISE_GLUED:
+            if title.startswith(w):
+                title = title[len(w):]
+        title = re.sub(r'^[\s\d٬.,/+-]+', '', title)
+        if title == before:
+            break
+    title = re.sub(r'\s*(أنمي|انمي|فيلم|مسلسل)\s*$', '', title)
     title = re.sub(r'\s*(مترجم|مدبلج)\s*$', '', title)
     title = re.sub(r'\s*-\w{1,4}\s*$', '', title)
     return title.strip()
