@@ -20,8 +20,16 @@ struct HomeView: View {
             chipRow
             ScrollView {
                 VStack(alignment: .leading, spacing: layout.rowSpacing) {
-                    if chip == .anime && !model.kidsOnly, let anime = model.tmdb.anime.first {
-                        animeHero(anime)
+                    if chip == .anime && !model.kidsOnly {
+                        if let anime = model.anilist.trending.first {
+                            animeHero(anime)
+                        } else if model.anilist.isLoading {
+                            ProgressView(model.language.t("نجلب الأنمي الرائج...", "Loading trending anime..."))
+                                .frame(maxWidth: .infinity)
+                                .frame(height: heroHeight)
+                        }
+                    } else if let title = tmdbHeroTitle {
+                        tmdbHero(title)
                     } else if !featured.isEmpty {
                         hero(featured)
                     }
@@ -31,7 +39,10 @@ struct HomeView: View {
                     if chip != .anime && !model.myList().isEmpty {
                         myListRail
                     }
-                    if !model.kidsOnly && chip != .categories {
+                    if !model.kidsOnly && chip == .anime {
+                        animeCatalogSection
+                    }
+                    if !model.kidsOnly && chip != .categories && chip != .anime {
                         tmdbCatalogSection
                     }
                     if chip == .series {
@@ -58,7 +69,9 @@ struct HomeView: View {
             }
             .refreshable {
                 if !model.kidsOnly {
-                    await model.tmdb.refreshHomeCatalog(language: model.tmdbLanguage)
+                    async let refreshTMDB: Void = model.tmdb.refreshHomeCatalog(language: model.tmdbLanguage)
+                    async let refreshAnime: Void = model.anilist.refreshTrending()
+                    _ = await (refreshTMDB, refreshAnime)
                     model.reloadSourceRails()
                 }
             }
@@ -73,6 +86,7 @@ struct HomeView: View {
             if !model.kidsOnly {
                 model.reloadSourceRails()
                 model.tmdb.loadHomeCatalog(language: model.tmdbLanguage)
+                model.anilist.loadTrending()
             }
         }
         .onChange(of: model.tmdbLanguage) { _, language in
@@ -96,6 +110,7 @@ struct HomeView: View {
             if !model.kidsOnly {
                 model.reloadSourceRails()
                 model.tmdb.loadHomeCatalog(language: model.tmdbLanguage)
+                model.anilist.loadTrending()
             } else {
                 model.sourceRails = []
             }
@@ -124,6 +139,17 @@ struct HomeView: View {
         case .home, .categories:
             return base
         }
+    }
+
+    private var tmdbHeroTitle: TMDBTitle? {
+        guard model.tmdb.isConfigured else { return nil }
+        let candidates: [TMDBTitle] = switch chip {
+        case .home, .fresh: model.tmdb.trending
+        case .movies: model.tmdb.movies
+        case .series: model.tmdb.series
+        case .anime, .categories: []
+        }
+        return candidates.first(where: { $0.backdropURL != nil }) ?? candidates.first
     }
 
     @ToolbarContentBuilder
@@ -237,6 +263,51 @@ struct HomeView: View {
         )
     }
 
+    private var animeCatalogSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(model.language.t("أنمي رائج", "Trending anime"))
+                    .font(.title3.weight(.bold))
+                Text(model.language.t("كتالوج متخصص من AniList · معلومات فقط", "Specialist AniList catalog · metadata only"))
+                    .font(.caption2)
+                    .foregroundStyle(LaylTheme.muted)
+            }
+            .padding(.horizontal, sideInset)
+
+            if model.anilist.isLoading && model.anilist.trending.isEmpty {
+                ProgressView(model.language.t("نجلب الأنمي...", "Loading anime..."))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 24)
+            } else if model.anilist.trending.isEmpty {
+                VStack(spacing: 12) {
+                    EmptyState(
+                        systemImage: "sparkles",
+                        title: model.language.t("لا توجد نتائج أنمي الآن", "No anime results right now"),
+                        message: model.anilist.error ?? model.language.t("تحقق من الاتصال أو جرّب لاحقًا.", "Check your connection or try again later.")
+                    )
+                    Button {
+                        model.anilist.loadTrending(forceRefresh: true)
+                    } label: {
+                        Label(model.language.t("إعادة المحاولة", "Retry"), systemImage: "arrow.clockwise")
+                            .font(.caption.weight(.bold))
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(LaylTheme.red)
+                }
+                .padding(.horizontal, sideInset)
+            } else {
+                AniListRail(
+                    title: model.language.t("الأكثر رواجًا", "Trending now"),
+                    items: model.anilist.trending,
+                    posterWidth: layout.posterWidth
+                )
+            }
+            AniListAttributionFooter()
+                .padding(.horizontal, sideInset)
+        }
+        .laylHugsWidth()
+    }
+
     private var tmdbCatalogSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
@@ -269,7 +340,7 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(LaylTheme.elevated, in: RoundedRectangle(cornerRadius: 12))
                 .padding(.horizontal, sideInset)
-            } else if model.tmdb.isLoadingHome && model.tmdb.trending.isEmpty && model.tmdb.movies.isEmpty && model.tmdb.series.isEmpty && model.tmdb.anime.isEmpty {
+            } else if model.tmdb.isLoadingHome && model.tmdb.trending.isEmpty && model.tmdb.movies.isEmpty && model.tmdb.series.isEmpty {
                 ProgressView(model.language.t("نجلب الرائج عالميًا...", "Loading worldwide trends..."))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 24)
@@ -287,33 +358,7 @@ struct HomeView: View {
                     }
                     .padding(.horizontal, sideInset)
                 }
-                if chip == .anime {
-                    Text(model.language.t("تُستخرج النتائج من تصنيف الرسوم المتحركة واللغة اليابانية؛ وصف الأنمي تقريبي.", "Results use animation and Japanese-language filters; the anime label is approximate."))
-                        .font(.caption2)
-                        .foregroundStyle(LaylTheme.muted)
-                        .padding(.horizontal, sideInset)
-                    if model.tmdb.anime.isEmpty && model.tmdb.isLoadingHome {
-                        ProgressView(model.language.t("نجلب الأنمي...", "Loading anime..."))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 24)
-                    } else if model.tmdb.anime.isEmpty {
-                        VStack(spacing: 12) {
-                            EmptyState(
-                                systemImage: "sparkles",
-                                title: model.language.t("لا توجد نتائج أنمي الآن", "No anime results right now"),
-                                message: model.tmdb.homeError ?? model.language.t("تحقق من الاتصال أو جرّب لاحقًا.", "Check your connection or try again later.")
-                            )
-                            retryCatalogButton
-                        }
-                        .padding(.horizontal, sideInset)
-                    } else {
-                        TMDBRail(
-                            title: model.language.t("أنمي ياباني رائج", "Popular Japanese anime"),
-                            items: model.tmdb.anime,
-                            posterWidth: layout.posterWidth
-                        )
-                    }
-                } else if chip == .movies {
+                if chip == .movies {
                     tmdbCategoryContent(
                         title: model.language.t("أفلام رائجة", "Popular films"),
                         emptyTitle: model.language.t("لا توجد أفلام الآن", "No films available right now"),
@@ -507,10 +552,74 @@ struct HomeView: View {
         .laylHugsWidth()
     }
 
-    private func animeHero(_ title: TMDBTitle) -> some View {
-        let imageHeight = min(max(heroHeight * 0.94, 280), 390)
+    private func tmdbHero(_ title: TMDBTitle) -> some View {
+        let imageHeight = min(max(heroHeight * 0.94, 300), 410)
         return ZStack(alignment: .bottomLeading) {
             RemoteBackdropImage(urlString: title.backdropURL?.absoluteString, height: imageHeight)
+            LinearGradient(colors: [.clear, .black.opacity(0.96)], startPoint: .center, endPoint: .bottom)
+            LinearGradient(colors: [.black.opacity(0.25), .clear], startPoint: .top, endPoint: .center)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 7) {
+                    RoundedRectangle(cornerRadius: 1).fill(LaylTheme.red).frame(width: 3, height: 14)
+                    Text(model.language.t("رائج الآن", "Trending now"))
+                        .font(.caption.weight(.bold))
+                        .textCase(.uppercase)
+                        .tracking(1.1)
+                }
+                .foregroundStyle(.white.opacity(0.88))
+                Text(title.title)
+                    .font(.system(size: min(layout.heroTitleSize * 0.9, 42), weight: .black))
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.6)
+                HStack(spacing: 8) {
+                    if let year = title.year { Text(year) }
+                    Text(title.kind == "tv" ? model.language.t("مسلسل", "Series") : model.language.t("فيلم", "Movie"))
+                    if let rating = title.voteAverage, rating > 0 {
+                        Label(String(format: "%.1f", rating), systemImage: "star.fill")
+                    }
+                }
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.86))
+                if !title.overview.isEmpty {
+                    Text(title.overview)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.82))
+                        .lineLimit(2)
+                        .frame(maxWidth: 500, alignment: .leading)
+                }
+                HStack(spacing: 10) {
+                    NavigationLink(value: title) {
+                        Label(model.language.t("التفاصيل", "Details"), systemImage: "info.circle.fill")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(.black)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 10)
+                            .background(.white, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    Link(destination: title.tmdbURL) {
+                        Image(systemName: "arrow.up.right")
+                            .font(.subheadline.weight(.bold))
+                            .frame(width: 42, height: 42)
+                            .background(Color.white.opacity(0.2), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    }
+                    .accessibilityLabel(model.language.t("عرض في TMDB", "Open in TMDB"))
+                }
+            }
+            .padding(.horizontal, sideInset)
+            .padding(.bottom, 24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: imageHeight)
+        .clipped()
+    }
+
+    private func animeHero(_ title: AniListTitle) -> some View {
+        let imageHeight = min(max(heroHeight * 0.94, 280), 390)
+        return ZStack(alignment: .bottomLeading) {
+            RemoteBackdropImage(urlString: title.bannerURL?.absoluteString, height: imageHeight)
             LinearGradient(colors: [.clear, .black.opacity(0.94)], startPoint: .center, endPoint: .bottom)
             LinearGradient(colors: [.black.opacity(0.2), .clear], startPoint: .top, endPoint: .center)
             VStack(alignment: .leading, spacing: 10) {
@@ -519,21 +628,20 @@ struct HomeView: View {
                     .textCase(.uppercase)
                     .tracking(1.2)
                     .foregroundStyle(.white.opacity(0.8))
-                Text(title.title)
+                Text(title.displayTitle)
                     .font(.system(size: min(layout.heroTitleSize * 0.9, 40), weight: .black))
                     .lineLimit(2)
                     .minimumScaleFactor(0.65)
                 HStack(spacing: 8) {
-                    if let year = title.year { Text(year) }
-                    if let rating = title.voteAverage, rating > 0 {
-                        Label(String(format: "%.1f", rating), systemImage: "star.fill")
-                    }
+                    if let year = title.seasonYear { Text(String(year)) }
+                    if let rating = title.ratingText { Label(rating, systemImage: "star.fill") }
+                    if let episodes = title.episodes { Text(model.language.t("\(episodes) حلقة", "\(episodes) ep")) }
                     Text(model.language.t("أنمي · معلومات فقط", "Anime · details only"))
                 }
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.white.opacity(0.88))
                 NavigationLink(value: title) {
-                    Label(model.language.t("التفاصيل", "Details"), systemImage: "info.circle")
+                    Label(model.language.t("التفاصيل", "Details"), systemImage: "info.circle.fill")
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 18)

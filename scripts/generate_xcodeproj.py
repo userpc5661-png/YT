@@ -11,7 +11,7 @@ SWIFT_DIRS = [
     ("", ["LaylApp.swift"]),
     ("Model", ["Models.swift", "Catalog.swift", "AppModel.swift", "ContentSource.swift", "TMDBModels.swift"]),
     ("Design", ["Theme.swift", "LayoutMetrics.swift", "Glass.swift"]),
-    ("Services", ["JSONPath.swift", "KeychainStore.swift", "SourceClient.swift", "TMDBAPI.swift"]),
+    ("Services", ["JSONPath.swift", "KeychainStore.swift", "SourceClient.swift", "TMDBAPI.swift", "AniListAPI.swift"]),
     ("Views", [
         "Components.swift",
         "ProfilePickerView.swift",
@@ -26,6 +26,7 @@ SWIFT_DIRS = [
         "LayoutPreview.swift",
         "ClipsView.swift",
         "TMDBViews.swift",
+        "AniListViews.swift",
     ]),
 ]
 

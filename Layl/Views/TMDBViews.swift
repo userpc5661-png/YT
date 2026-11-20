@@ -155,11 +155,11 @@ struct DiscoverView: View {
                     .padding(.horizontal, layout.contentInset)
                 } else if !model.tmdb.isConfigured {
                     setupCard
-                } else if model.tmdb.isLoadingHome && globalTitles.isEmpty && model.tmdb.movies.isEmpty && model.tmdb.series.isEmpty && model.tmdb.anime.isEmpty {
+                } else if model.tmdb.isLoadingHome && globalTitles.isEmpty && model.tmdb.movies.isEmpty && model.tmdb.series.isEmpty {
                     ProgressView(model.language.t("نجلب الرائج عالميًا...", "Loading worldwide trends..."))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 48)
-                } else if globalTitles.isEmpty && model.tmdb.movies.isEmpty && model.tmdb.series.isEmpty && model.tmdb.anime.isEmpty {
+                } else if globalTitles.isEmpty && model.tmdb.movies.isEmpty && model.tmdb.series.isEmpty {
                     VStack(spacing: 12) {
                         EmptyState(
                             systemImage: "wifi.exclamationmark",
@@ -198,19 +198,39 @@ struct DiscoverView: View {
                         items: model.tmdb.series,
                         posterWidth: layout.posterWidth
                     )
-                    TMDBRail(
-                        title: model.language.t("أنمي ورسوم يابانية رائجة", "Popular anime & Japanese animation"),
-                        items: model.tmdb.anime,
-                        posterWidth: layout.posterWidth
-                    )
-                    Text(model.language.t(
-                        "يُقدّر تصنيف الأنمي باستخدام نوع الرسوم المتحركة واللغة اليابانية، وقد لا يشمل كل الأعمال.",
-                        "Anime is approximated using the animation genre and Japanese language, so some titles may be missed."
-                    ))
-                    .font(.caption2)
-                    .foregroundStyle(LaylTheme.muted)
-                    .padding(.horizontal, layout.contentInset)
                     TMDBAttributionFooter()
+                        .padding(.horizontal, layout.contentInset)
+                }
+                if !model.kidsOnly {
+                    if model.anilist.isLoading && model.anilist.trending.isEmpty {
+                        ProgressView(model.language.t("نجلب الأنمي...", "Loading anime..."))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 24)
+                    } else if model.anilist.trending.isEmpty {
+                        VStack(spacing: 12) {
+                            EmptyState(
+                                systemImage: "sparkles",
+                                title: model.language.t("لا توجد نتائج أنمي الآن", "No anime results right now"),
+                                message: model.anilist.error ?? model.language.t("تحقق من الاتصال أو جرّب لاحقًا.", "Check your connection or try again later.")
+                            )
+                            Button {
+                                model.anilist.loadTrending(forceRefresh: true)
+                            } label: {
+                                Label(model.language.t("إعادة المحاولة", "Retry"), systemImage: "arrow.clockwise")
+                                    .font(.caption.weight(.bold))
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(LaylTheme.red)
+                        }
+                        .padding(.horizontal, layout.contentInset)
+                    } else {
+                        AniListRail(
+                            title: model.language.t("أنمي رائج · AniList", "Trending anime · AniList"),
+                            items: model.anilist.trending,
+                            posterWidth: layout.posterWidth
+                        )
+                    }
+                    AniListAttributionFooter()
                         .padding(.horizontal, layout.contentInset)
                 }
             }
@@ -223,12 +243,15 @@ struct DiscoverView: View {
         .laylNavigationChrome()
         .refreshable {
             if !model.kidsOnly {
-                await model.tmdb.refreshHomeCatalog(language: model.tmdbLanguage)
+                async let refreshTMDB: Void = model.tmdb.refreshHomeCatalog(language: model.tmdbLanguage)
+                async let refreshAnime: Void = model.anilist.refreshTrending()
+                _ = await (refreshTMDB, refreshAnime)
             }
         }
         .onAppear {
             if !model.kidsOnly {
                 model.tmdb.loadHomeCatalog(language: model.tmdbLanguage)
+                model.anilist.loadTrending()
             }
         }
         .onChange(of: model.tmdbLanguage) { _, language in
@@ -241,9 +264,9 @@ struct DiscoverView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(model.language.t("أفلام ومسلسلات وأنمي من العالم", "Films, series & anime from around the world"))
+                Text(model.language.t("أفلام ومسلسلات من TMDB · أنمي من AniList", "Films & series from TMDB · anime from AniList"))
                     .font(.headline)
-                Text(model.language.t("بيانات وصور من TMDB · لا تشمل تشغيل الفيديو", "Metadata and artwork by TMDB · no video playback"))
+                Text(model.language.t("بيانات وصور فقط · لا تشمل تشغيل الفيديو", "Metadata and artwork only · no video playback"))
                     .font(.caption)
                     .foregroundStyle(LaylTheme.muted)
             }
@@ -273,11 +296,11 @@ struct DiscoverView: View {
 
     private var setupCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(model.language.t("فعّل الكتالوج العالمي المجاني", "Enable the free global catalog"))
+            Text(model.language.t("فعّل كتالوج TMDB للأفلام والمسلسلات", "Enable TMDB movies and series"))
                 .font(.title3.weight(.bold))
             Text(model.language.t(
-                "أنشئ رمز API Read Access Token مجانيًا من TMDB للاستخدام غير التجاري، ثم أضفه في الإعدادات. نستخدمه لبيانات الأفلام والمسلسلات والأنمي وصورها فقط.",
-                "Create a free TMDB API Read Access Token for non-commercial use, then add it in Settings. It provides movie, TV and anime metadata and artwork only."
+                "أنشئ رمز API Read Access Token من TMDB للاستخدام غير التجاري، ثم أضفه في الإعدادات. الأنمي متاح من AniList ولا يحتاج رمزًا منفصلًا.",
+                "Create a TMDB API Read Access Token for non-commercial use, then add it in Settings. Anime is provided by AniList and needs no separate token."
             ))
             .font(.subheadline)
             .foregroundStyle(LaylTheme.muted)

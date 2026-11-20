@@ -20,19 +20,21 @@
 		00000000A11000000000002D /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002C /* KeychainStore.swift */; };
 		00000000A11000000000002F /* SourceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000002E /* SourceClient.swift */; };
 		00000000A110000000000031 /* TMDBAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000030 /* TMDBAPI.swift */; };
-		00000000A110000000000034 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000033 /* Components.swift */; };
-		00000000A110000000000036 /* ProfilePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000035 /* ProfilePickerView.swift */; };
-		00000000A110000000000038 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000037 /* HomeView.swift */; };
-		00000000A11000000000003A /* TitleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000039 /* TitleDetailView.swift */; };
-		00000000A11000000000003C /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003B /* PlayerView.swift */; };
-		00000000A11000000000003E /* LibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003D /* LibraryViews.swift */; };
-		00000000A110000000000040 /* MainShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003F /* MainShell.swift */; };
-		00000000A110000000000042 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000041 /* SettingsView.swift */; };
-		00000000A110000000000044 /* RemotePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000043 /* RemotePlayerView.swift */; };
-		00000000A110000000000046 /* SourceViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000045 /* SourceViews.swift */; };
-		00000000A110000000000048 /* LayoutPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000047 /* LayoutPreview.swift */; };
-		00000000A11000000000004A /* ClipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000049 /* ClipsView.swift */; };
-		00000000A11000000000004C /* TMDBViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004B /* TMDBViews.swift */; };
+		00000000A110000000000033 /* AniListAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000032 /* AniListAPI.swift */; };
+		00000000A110000000000036 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000035 /* Components.swift */; };
+		00000000A110000000000038 /* ProfilePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000037 /* ProfilePickerView.swift */; };
+		00000000A11000000000003A /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000039 /* HomeView.swift */; };
+		00000000A11000000000003C /* TitleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003B /* TitleDetailView.swift */; };
+		00000000A11000000000003E /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003D /* PlayerView.swift */; };
+		00000000A110000000000040 /* LibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000003F /* LibraryViews.swift */; };
+		00000000A110000000000042 /* MainShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000041 /* MainShell.swift */; };
+		00000000A110000000000044 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000043 /* SettingsView.swift */; };
+		00000000A110000000000046 /* RemotePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000045 /* RemotePlayerView.swift */; };
+		00000000A110000000000048 /* SourceViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000047 /* SourceViews.swift */; };
+		00000000A11000000000004A /* LayoutPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000049 /* LayoutPreview.swift */; };
+		00000000A11000000000004C /* ClipsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004B /* ClipsView.swift */; };
+		00000000A11000000000004E /* TMDBViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004D /* TMDBViews.swift */; };
+		00000000A110000000000050 /* AniListViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000A11000000000004F /* AniListViews.swift */; };
 		00000000A110000000000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000012 /* Assets.xcassets */; };
 		00000000A110000000000013 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 00000000A110000000000011 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -51,19 +53,21 @@
 		00000000A11000000000002C /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		00000000A11000000000002E /* SourceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceClient.swift; sourceTree = "<group>"; };
 		00000000A110000000000030 /* TMDBAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBAPI.swift; sourceTree = "<group>"; };
-		00000000A110000000000033 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
-		00000000A110000000000035 /* ProfilePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePickerView.swift; sourceTree = "<group>"; };
-		00000000A110000000000037 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		00000000A110000000000039 /* TitleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailView.swift; sourceTree = "<group>"; };
-		00000000A11000000000003B /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
-		00000000A11000000000003D /* LibraryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViews.swift; sourceTree = "<group>"; };
-		00000000A11000000000003F /* MainShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShell.swift; sourceTree = "<group>"; };
-		00000000A110000000000041 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		00000000A110000000000043 /* RemotePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePlayerView.swift; sourceTree = "<group>"; };
-		00000000A110000000000045 /* SourceViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViews.swift; sourceTree = "<group>"; };
-		00000000A110000000000047 /* LayoutPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutPreview.swift; sourceTree = "<group>"; };
-		00000000A110000000000049 /* ClipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsView.swift; sourceTree = "<group>"; };
-		00000000A11000000000004B /* TMDBViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBViews.swift; sourceTree = "<group>"; };
+		00000000A110000000000032 /* AniListAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AniListAPI.swift; sourceTree = "<group>"; };
+		00000000A110000000000035 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		00000000A110000000000037 /* ProfilePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePickerView.swift; sourceTree = "<group>"; };
+		00000000A110000000000039 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		00000000A11000000000003B /* TitleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailView.swift; sourceTree = "<group>"; };
+		00000000A11000000000003D /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		00000000A11000000000003F /* LibraryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViews.swift; sourceTree = "<group>"; };
+		00000000A110000000000041 /* MainShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShell.swift; sourceTree = "<group>"; };
+		00000000A110000000000043 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		00000000A110000000000045 /* RemotePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePlayerView.swift; sourceTree = "<group>"; };
+		00000000A110000000000047 /* SourceViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViews.swift; sourceTree = "<group>"; };
+		00000000A110000000000049 /* LayoutPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutPreview.swift; sourceTree = "<group>"; };
+		00000000A11000000000004B /* ClipsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsView.swift; sourceTree = "<group>"; };
+		00000000A11000000000004D /* TMDBViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TMDBViews.swift; sourceTree = "<group>"; };
+		00000000A11000000000004F /* AniListViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AniListViews.swift; sourceTree = "<group>"; };
 		00000000A110000000000010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00000000A110000000000011 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		00000000A110000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -103,8 +107,8 @@
 				00000000A110000000000015 /* LaylApp.swift */,
 				00000000A110000000000022 /* Model */,
 				00000000A110000000000029 /* Design */,
-				00000000A110000000000032 /* Services */,
-				00000000A11000000000004D /* Views */,
+				00000000A110000000000034 /* Services */,
+				00000000A110000000000051 /* Views */,
 				00000000A110000000000012 /* Assets.xcassets */,
 				00000000A110000000000010 /* Info.plist */,
 				00000000A110000000000011 /* PrivacyInfo.xcprivacy */,
@@ -134,33 +138,35 @@
 			path = Design;
 			sourceTree = "<group>";
 		};
-		00000000A110000000000032 /* Services */ = {
+		00000000A110000000000034 /* Services */ = {
 			isa = PBXGroup;
 			children = (
 				00000000A11000000000002A /* JSONPath.swift */,
 				00000000A11000000000002C /* KeychainStore.swift */,
 				00000000A11000000000002E /* SourceClient.swift */,
 				00000000A110000000000030 /* TMDBAPI.swift */,
+				00000000A110000000000032 /* AniListAPI.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		00000000A11000000000004D /* Views */ = {
+		00000000A110000000000051 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				00000000A110000000000033 /* Components.swift */,
-				00000000A110000000000035 /* ProfilePickerView.swift */,
-				00000000A110000000000037 /* HomeView.swift */,
-				00000000A110000000000039 /* TitleDetailView.swift */,
-				00000000A11000000000003B /* PlayerView.swift */,
-				00000000A11000000000003D /* LibraryViews.swift */,
-				00000000A11000000000003F /* MainShell.swift */,
-				00000000A110000000000041 /* SettingsView.swift */,
-				00000000A110000000000043 /* RemotePlayerView.swift */,
-				00000000A110000000000045 /* SourceViews.swift */,
-				00000000A110000000000047 /* LayoutPreview.swift */,
-				00000000A110000000000049 /* ClipsView.swift */,
-				00000000A11000000000004B /* TMDBViews.swift */,
+				00000000A110000000000035 /* Components.swift */,
+				00000000A110000000000037 /* ProfilePickerView.swift */,
+				00000000A110000000000039 /* HomeView.swift */,
+				00000000A11000000000003B /* TitleDetailView.swift */,
+				00000000A11000000000003D /* PlayerView.swift */,
+				00000000A11000000000003F /* LibraryViews.swift */,
+				00000000A110000000000041 /* MainShell.swift */,
+				00000000A110000000000043 /* SettingsView.swift */,
+				00000000A110000000000045 /* RemotePlayerView.swift */,
+				00000000A110000000000047 /* SourceViews.swift */,
+				00000000A110000000000049 /* LayoutPreview.swift */,
+				00000000A11000000000004B /* ClipsView.swift */,
+				00000000A11000000000004D /* TMDBViews.swift */,
+				00000000A11000000000004F /* AniListViews.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -249,19 +255,21 @@
 				00000000A11000000000002D /* KeychainStore.swift in Sources */,
 				00000000A11000000000002F /* SourceClient.swift in Sources */,
 				00000000A110000000000031 /* TMDBAPI.swift in Sources */,
-				00000000A110000000000034 /* Components.swift in Sources */,
-				00000000A110000000000036 /* ProfilePickerView.swift in Sources */,
-				00000000A110000000000038 /* HomeView.swift in Sources */,
-				00000000A11000000000003A /* TitleDetailView.swift in Sources */,
-				00000000A11000000000003C /* PlayerView.swift in Sources */,
-				00000000A11000000000003E /* LibraryViews.swift in Sources */,
-				00000000A110000000000040 /* MainShell.swift in Sources */,
-				00000000A110000000000042 /* SettingsView.swift in Sources */,
-				00000000A110000000000044 /* RemotePlayerView.swift in Sources */,
-				00000000A110000000000046 /* SourceViews.swift in Sources */,
-				00000000A110000000000048 /* LayoutPreview.swift in Sources */,
-				00000000A11000000000004A /* ClipsView.swift in Sources */,
-				00000000A11000000000004C /* TMDBViews.swift in Sources */,
+				00000000A110000000000033 /* AniListAPI.swift in Sources */,
+				00000000A110000000000036 /* Components.swift in Sources */,
+				00000000A110000000000038 /* ProfilePickerView.swift in Sources */,
+				00000000A11000000000003A /* HomeView.swift in Sources */,
+				00000000A11000000000003C /* TitleDetailView.swift in Sources */,
+				00000000A11000000000003E /* PlayerView.swift in Sources */,
+				00000000A110000000000040 /* LibraryViews.swift in Sources */,
+				00000000A110000000000042 /* MainShell.swift in Sources */,
+				00000000A110000000000044 /* SettingsView.swift in Sources */,
+				00000000A110000000000046 /* RemotePlayerView.swift in Sources */,
+				00000000A110000000000048 /* SourceViews.swift in Sources */,
+				00000000A11000000000004A /* LayoutPreview.swift in Sources */,
+				00000000A11000000000004C /* ClipsView.swift in Sources */,
+				00000000A11000000000004E /* TMDBViews.swift in Sources */,
+				00000000A110000000000050 /* AniListViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

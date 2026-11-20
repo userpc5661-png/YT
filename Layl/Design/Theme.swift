@@ -36,6 +36,9 @@ extension View {
         .navigationDestination(for: TMDBTitle.self) { title in
             TMDBDetailView(title: title)
         }
+        .navigationDestination(for: AniListTitle.self) { title in
+            AniListDetailView(title: title)
+        }
         .navigationDestination(for: RemoteTitle.self) { title in
             RemoteDetailView(title: title)
         }

@@ -8,6 +8,7 @@ final class AppModel {
     var activeProfileID: String?
     var playRequest: PlayRequest?
     let tmdb = TMDBCatalogModel()
+    let anilist = AniListCatalogModel()
     var contentDensity: ContentDensity
     var heroCarouselEnabled: Bool
     var sources: [ContentSource] = []

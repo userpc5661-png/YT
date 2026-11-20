@@ -155,7 +155,7 @@ struct SearchView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(LaylTheme.muted)
-                    TextField(model.language.t("ابحث عن فيلم أو مسلسل", "Search movies and series"), text: $query)
+                    TextField(model.language.t("ابحث عن فيلم أو مسلسل أو أنمي", "Search movies, series or anime"), text: $query)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                     if !query.isEmpty {
@@ -173,6 +173,7 @@ struct SearchView: View {
                 .padding(.horizontal, layout.contentInset)
                 .onChange(of: query) { _, value in
                     model.tmdb.search(value, language: model.tmdbLanguage, kidsOnly: model.kidsOnly)
+                    model.anilist.search(model.kidsOnly ? "" : value)
                     model.searchSources(value)
                 }
 
@@ -189,6 +190,7 @@ struct SearchView: View {
 
                 if !model.kidsOnly, query.trimmingCharacters(in: .whitespacesAndNewlines).count >= 2 {
                     globalSearchSection
+                    animeSearchSection
                 }
                 if !model.kidsOnly, !model.sourceSearch.isEmpty {
                     RemoteRail(
@@ -198,7 +200,7 @@ struct SearchView: View {
                     )
                 }
 
-                if titles.isEmpty && model.tmdb.searchResults.isEmpty && !model.tmdb.isSearching && model.tmdb.searchError == nil {
+                if titles.isEmpty && model.tmdb.searchResults.isEmpty && model.anilist.searchResults.isEmpty && !model.tmdb.isSearching && !model.anilist.isSearching && model.tmdb.searchError == nil && model.anilist.searchError == nil {
                     EmptyState(
                         systemImage: "magnifyingglass",
                         title: model.language.t("لا توجد نتائج", "No results"),
@@ -261,6 +263,37 @@ struct SearchView: View {
                     posterWidth: layout.posterWidth
                 )
                 TMDBAttributionFooter()
+                    .padding(.horizontal, layout.contentInset)
+            }
+        }
+        .laylHugsWidth()
+    }
+
+    private var animeSearchSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(model.language.t("نتائج الأنمي · AniList", "Anime results · AniList"))
+                .font(.headline)
+                .padding(.horizontal, layout.contentInset)
+            if model.anilist.isSearching && model.anilist.searchResults.isEmpty {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else if let error = model.anilist.searchError {
+                Text(error)
+                    .font(.footnote)
+                    .foregroundStyle(LaylTheme.muted)
+                    .padding(.horizontal, layout.contentInset)
+            } else if model.anilist.searchResults.isEmpty {
+                Text(model.language.t("لا توجد نتائج أنمي لهذا الاسم.", "No anime matches for this title."))
+                    .font(.footnote)
+                    .foregroundStyle(LaylTheme.muted)
+                    .padding(.horizontal, layout.contentInset)
+            } else {
+                AniListRail(
+                    title: model.language.t("الأنمي المطابق", "Matching anime"),
+                    items: model.anilist.searchResults,
+                    posterWidth: layout.posterWidth
+                )
+                AniListAttributionFooter()
                     .padding(.horizontal, layout.contentInset)
             }
         }

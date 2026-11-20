@@ -13,8 +13,8 @@ struct SettingsView: View {
         Form {
             SwiftUI.Section {
                 Text(model.language.t(
-                    "أضف رمز TMDB المجاني لاستكشاف الأفلام والمسلسلات والأنمي. البيانات والصور فقط؛ الرمز لا يفتح بث الفيديو.",
-                    "Add a free TMDB token to explore films, series, and anime. It provides data and artwork only, not video streams."
+                    "أضف رمز TMDB لاستكشاف الأفلام والمسلسلات. بيانات الأنمي تأتي من AniList دون رمز إضافي. لا يوفر أي منهما بث الفيديو.",
+                    "Add a TMDB token to explore films and series. Anime data comes from AniList with no extra token. Neither provides video streams."
                 ))
                 .font(.footnote)
                 .foregroundStyle(.secondary)

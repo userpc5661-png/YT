@@ -25,7 +25,6 @@ struct TMDBHomeCatalog: Sendable {
     let trending: [TMDBTitle]?
     let movies: [TMDBTitle]?
     let series: [TMDBTitle]?
-    let anime: [TMDBTitle]?
     let error: String?
     let hasPartialFailure: Bool
 }
@@ -88,54 +87,23 @@ actor TMDBAPI {
             filters: [],
             accessToken: accessToken
         )
-        async let animeMovies = try? await discover(
-            media: "movie",
-            language: language,
-            filters: animeFilters,
-            accessToken: accessToken
-        )
-        async let animeSeries = try? await discover(
-            media: "tv",
-            language: language,
-            filters: animeFilters,
-            accessToken: accessToken
-        )
 
-        let (trendingResults, movieResults, seriesResults, animeMovieResults, animeSeriesResults) = await (
-            trending, movies, series, animeMovies, animeSeries
-        )
-        let anime = Dictionary(
-            ((animeMovieResults ?? []) + (animeSeriesResults ?? [])).map { ($0.id, $0) },
-            uniquingKeysWith: { first, _ in first }
-        )
-        .values
-        .sorted { ($0.popularity ?? 0) > ($1.popularity ?? 0) }
-        let animeResults: [TMDBTitle]? = animeMovieResults == nil && animeSeriesResults == nil ? nil : anime
+        let (trendingResults, movieResults, seriesResults) = await (trending, movies, series)
 
         let failures = [
             trendingResults == nil,
             movieResults == nil,
-            seriesResults == nil,
-            animeMovieResults == nil,
-            animeSeriesResults == nil
+            seriesResults == nil
         ]
         return TMDBHomeCatalog(
             trending: trendingResults,
             movies: movieResults,
             series: seriesResults,
-            anime: animeResults,
             error: failures.allSatisfy { $0 }
                 ? "TMDB could not load the catalog. Check your connection or access token."
                 : nil,
             hasPartialFailure: failures.contains(true) && !failures.allSatisfy { $0 }
         )
-    }
-
-    private var animeFilters: [URLQueryItem] {
-        [
-            URLQueryItem(name: "with_genres", value: "16"),
-            URLQueryItem(name: "with_original_language", value: "ja")
-        ]
     }
 
     private func discover(
@@ -195,7 +163,6 @@ final class TMDBCatalogModel {
     private(set) var trending: [TMDBTitle] = []
     private(set) var movies: [TMDBTitle] = []
     private(set) var series: [TMDBTitle] = []
-    private(set) var anime: [TMDBTitle] = []
     private(set) var searchResults: [TMDBTitle] = []
     private(set) var isLoading = false
     private(set) var isLoadingHome = false
@@ -247,7 +214,6 @@ final class TMDBCatalogModel {
         trending = []
         movies = []
         series = []
-        anime = []
         searchResults = []
         loadedLanguage = nil
         loadedHomeLanguage = nil
@@ -345,11 +311,9 @@ final class TMDBCatalogModel {
             else if previousLanguage != language { self.movies = [] }
             if let values = catalog.series { self.series = values }
             else if previousLanguage != language { self.series = [] }
-            if let values = catalog.anime { self.anime = values }
-            else if previousLanguage != language { self.anime = [] }
             self.loadedLanguage = language
             self.loadedHomeLanguage = catalog.error == nil && !catalog.hasPartialFailure ? language : nil
-            if catalog.trending != nil || catalog.movies != nil || catalog.series != nil || catalog.anime != nil {
+            if catalog.trending != nil || catalog.movies != nil || catalog.series != nil {
                 self.loadedHomeDataLanguage = language
             }
             self.error = catalog.error
