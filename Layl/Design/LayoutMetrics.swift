@@ -64,7 +64,6 @@ struct LaylLayoutMetrics: Equatable {
         dynamicTypeSize: DynamicTypeSize = .large
     ) -> LaylLayoutMetrics {
         let shortSide = min(max(width, 1), max(height, 1))
-        let longSide = max(width, height)
         let phoneClass = classify(shortSide: shortSide, regular: horizontalSizeClass == .regular)
         let typeScale = typeScale(for: dynamicTypeSize)
         let densityFactor: CGFloat = density == .compact ? 0.9 : 1
@@ -81,6 +80,7 @@ struct LaylLayoutMetrics: Equatable {
         }
         let posterWidth = (shortSide * posterShare).clamped(to: 92...176) * densityFactor * min(typeScale, 1.12)
         let posterHeight = posterWidth * 1.5
+        let gridMinWidth = phoneClass == .pad ? max(posterWidth, 144) : max(posterWidth, 104)
 
         let heroRatio: CGFloat = switch phoneClass {
         case .se: 0.92
@@ -103,14 +103,14 @@ struct LaylLayoutMetrics: Equatable {
         return LaylLayoutMetrics(
             phoneClass: phoneClass,
             screenWidth: width,
-            screenHeight: longSide,
+            screenHeight: height,
             safeTop: safeTop,
             safeBottom: safeBottom,
             contentInset: inset,
             heroHeight: heroHeight,
             posterWidth: posterWidth,
             posterHeight: posterHeight,
-            gridMinWidth: posterWidth,
+            gridMinWidth: gridMinWidth,
             heroTitleSize: titleSize,
             detailTitleSize: detailSize,
             continueCardWidth: continueWidth,

@@ -18,12 +18,16 @@ enum SourceFeed: Equatable {
     case movies
     case series
     case search(String)
-    case episodes(String)
 }
 
 enum SourceClient {
-    static func load(_ source: ContentSource, feed: SourceFeed, page: Int? = nil) async throws -> [RemoteTitle] {
-        let secret = KeychainStore.get(account: source.id.uuidString) ?? ""
+    static func load(
+        _ source: ContentSource,
+        feed: SourceFeed,
+        page: Int? = nil,
+        secret providedSecret: String? = nil
+    ) async throws -> [RemoteTitle] {
+        let secret = providedSecret ?? KeychainStore.get(account: source.id.uuidString) ?? ""
         let path: String
         let kind: TitleKind
         switch feed {
@@ -33,12 +37,9 @@ enum SourceClient {
         case .series:
             path = source.seriesPath
             kind = .series
-        case .search(let query):
+        case .search(_):
             path = source.searchPath
             kind = .movie
-        case .episodes(let id):
-            path = source.episodesPath.replacingOccurrences(of: "{id}", with: id)
-            kind = .series
         }
         guard !path.trimmingCharacters(in: .whitespaces).isEmpty else { return [] }
         let query = switch feed {
@@ -56,9 +57,6 @@ enum SourceClient {
             throw SourceClientError.status(http.statusCode)
         }
         let json = try JSONSerialization.jsonObject(with: data)
-        if case .episodes = feed {
-            return []
-        }
         return JSONPath.items(json, path: source.map.items).map { item in
             parse(item, source: source, fallbackKind: kind)
         }
@@ -156,13 +154,16 @@ enum SourceClient {
     private static func mediaURL(_ raw: String?, prefix: String) -> URL? {
         guard var raw, !raw.isEmpty, raw != "<null>" else { return nil }
         if raw.hasPrefix("http://") || raw.hasPrefix("https://") {
-            return URL(string: raw)
+            guard let url = URL(string: raw), url.scheme?.lowercased() == "https" else { return nil }
+            return url
         }
         if !prefix.isEmpty {
             let base = prefix.hasSuffix("/") ? String(prefix.dropLast()) : prefix
             if !raw.hasPrefix("/") { raw = "/" + raw }
-            return URL(string: base + raw)
+            guard let url = URL(string: base + raw), url.scheme?.lowercased() == "https" else { return nil }
+            return url
         }
-        return URL(string: raw)
+        guard let url = URL(string: raw), url.scheme?.lowercased() == "https" else { return nil }
+        return url
     }
 }

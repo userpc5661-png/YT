@@ -84,15 +84,20 @@ struct ContentSource: Identifiable, Codable, Hashable {
 
     func resolved(path: String, query: String? = nil, itemID: String? = nil, page: Int? = nil) -> URL? {
         var raw = path
+        let unreserved = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~")
         if let query {
-            raw = raw.replacingOccurrences(of: "{query}", with: query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query)
+            let encoded = query.addingPercentEncoding(withAllowedCharacters: unreserved) ?? query
+            raw = raw.replacingOccurrences(of: "{query}", with: encoded)
         }
         if let itemID {
-            raw = raw.replacingOccurrences(of: "{id}", with: itemID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? itemID)
+            let encoded = itemID.addingPercentEncoding(withAllowedCharacters: unreserved) ?? itemID
+            raw = raw.replacingOccurrences(of: "{id}", with: encoded)
         }
         let base = baseURL.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         let suffix = raw.hasPrefix("http") ? raw : base + (raw.hasPrefix("/") ? raw : "/" + raw)
         guard var components = URLComponents(string: suffix) else { return nil }
+        guard components.scheme?.lowercased() == "https", components.host != nil,
+              components.user == nil, components.password == nil else { return nil }
         if pageStyle == .pageQuery, let page {
             var items = components.queryItems ?? []
             items.append(URLQueryItem(name: pageParameter.isEmpty ? "page" : pageParameter, value: String(page)))
@@ -123,9 +128,8 @@ struct RemoteTitle: Identifiable, Hashable {
     var kind: TitleKind
 
     var directVideo: Bool {
-        guard let streamURL else { return false }
-        let path = streamURL.absoluteString.lowercased()
-        return ["mp4", "m3u8", "mov", "m4v", "webm"].contains(where: { path.contains(".\($0)") })
+        guard let streamURL, streamURL.scheme?.lowercased() == "https" else { return false }
+        return ["mp4", "m3u8", "mov", "m4v"].contains(streamURL.pathExtension.lowercased())
     }
 }
 
@@ -165,33 +169,4 @@ enum SourcePresets {
         )
     }
 
-    static func streamingAvailability() -> ContentSource {
-        var map = FieldMap.empty
-        map.items = ""
-        map.title = "title"
-        map.overview = "overview"
-        map.poster = "imageSet.verticalPoster.w360"
-        map.backdrop = "imageSet.horizontalBackdrop.w720"
-        map.year = "releaseYear|firstAirYear"
-        map.rating = "rating"
-        map.stream = "streamingOptions.sa.0.link"
-        map.genres = "genres"
-        map.imagePrefix = ""
-        return ContentSource(
-            id: UUID(),
-            name: "Streaming Availability",
-            enabled: true,
-            baseURL: "https://api.movieofthenight.com/v4",
-            moviesPath: "/shows/top?country=sa&service=netflix&show_type=movie",
-            seriesPath: "/shows/top?country=sa&service=netflix&show_type=series",
-            searchPath: "/shows/search/title?country=sa&title={query}",
-            episodesPath: "",
-            authKind: .header,
-            authName: "X-API-Key",
-            pageStyle: .none,
-            pageParameter: "page",
-            pageStart: 1,
-            map: map
-        )
-    }
 }

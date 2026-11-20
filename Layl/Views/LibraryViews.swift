@@ -172,7 +172,7 @@ struct SearchView: View {
                 .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
                 .padding(.horizontal, layout.contentInset)
                 .onChange(of: query) { _, value in
-                    model.searchStreaming(query: value)
+                    model.tmdb.search(value, language: model.tmdbLanguage, kidsOnly: model.kidsOnly)
                     model.searchSources(value)
                 }
 
@@ -187,10 +187,10 @@ struct SearchView: View {
                 }
                 .laylHugsWidth()
 
-                if model.hasStreamingAPI, !query.trimmingCharacters(in: .whitespaces).isEmpty {
-                    streamingSection
+                if !model.kidsOnly, query.trimmingCharacters(in: .whitespacesAndNewlines).count >= 2 {
+                    globalSearchSection
                 }
-                if !model.sourceSearch.isEmpty {
+                if !model.kidsOnly, !model.sourceSearch.isEmpty {
                     RemoteRail(
                         title: model.language.t("مصادرك", "Your sources"),
                         titles: model.sourceSearch,
@@ -198,13 +198,13 @@ struct SearchView: View {
                     )
                 }
 
-                if titles.isEmpty {
+                if titles.isEmpty && model.tmdb.searchResults.isEmpty && !model.tmdb.isSearching && model.tmdb.searchError == nil {
                     EmptyState(
                         systemImage: "magnifyingglass",
                         title: model.language.t("لا توجد نتائج", "No results"),
                         message: model.language.t("جرّب اسمًا آخر أو تصنيفًا مختلفًا.", "Try another title or genre.")
                     )
-                } else {
+                } else if !titles.isEmpty {
                     Text(model.language.t("تشغيل داخل ليل", "Play inside Layl"))
                         .font(.headline)
                         .padding(.horizontal, layout.contentInset)
@@ -227,32 +227,41 @@ struct SearchView: View {
         .laylNavigationChrome()
     }
 
-    private var streamingSection: some View {
+    private var globalSearchSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(model.language.t("نتائج البث (API)", "Streaming results (API)"))
+            Text(model.language.t("نتائج عالمية · TMDB", "Worldwide results · TMDB"))
                 .font(.headline)
                 .padding(.horizontal, layout.contentInset)
-            if model.streamingSearchLoading {
+            if !model.tmdb.isConfigured {
+                HStack {
+                    Text(model.language.t("أضف رمز TMDB مجانيًا للبحث العالمي.", "Add a free TMDB token for worldwide search."))
+                        .font(.footnote)
+                    Spacer(minLength: 8)
+                    NavigationLink(model.language.t("إعداد", "Set up")) { SettingsView() }
+                        .font(.caption.weight(.bold))
+                }
+                .padding(.horizontal, layout.contentInset)
+            } else if model.tmdb.isSearching {
                 ProgressView()
                     .frame(maxWidth: .infinity)
-            } else if model.streamingSearchResults.isEmpty {
-                Text(model.language.t("لا توجد نتائج بث لهذا الاسم.", "No streaming matches for this name."))
+            } else if let error = model.tmdb.searchError {
+                Text(error)
+                    .font(.footnote)
+                    .foregroundStyle(LaylTheme.muted)
+                    .padding(.horizontal, layout.contentInset)
+            } else if model.tmdb.searchResults.isEmpty {
+                Text(model.language.t("لا توجد نتائج عالمية لهذا الاسم.", "No worldwide matches for this title."))
                     .font(.footnote)
                     .foregroundStyle(LaylTheme.muted)
                     .padding(.horizontal, layout.contentInset)
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(model.streamingSearchResults) { show in
-                            NavigationLink(value: show) {
-                                StreamingShowCard(show: show, width: layout.posterWidth)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
+                TMDBRail(
+                    title: model.language.t("نتائج الأفلام والمسلسلات", "Movie and TV results"),
+                    items: model.tmdb.searchResults,
+                    posterWidth: layout.posterWidth
+                )
+                TMDBAttributionFooter()
                     .padding(.horizontal, layout.contentInset)
-                }
-                .laylHugsWidth()
             }
         }
         .laylHugsWidth()

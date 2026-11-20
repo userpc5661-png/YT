@@ -5,49 +5,34 @@ struct SettingsView: View {
     @Environment(\.laylLayout) private var layout
     @Environment(\.dismiss) private var dismiss
 
-    @State private var apiKey: String = ""
-    @State private var provider: StreamingAPIProvider = .movieOfTheNight
-    @State private var country: String = "sa"
+    @State private var tmdbToken = ""
     @State private var density: ContentDensity = .comfortable
     @State private var heroCarousel = true
-    @State private var services: Set<String> = []
 
     var body: some View {
         Form {
             SwiftUI.Section {
-                NavigationLink(model.language.t("ربط أي واجهة", "Connect any API")) {
-                    SourceListView()
-                }
-            }
-            SwiftUI.Section {
                 Text(model.language.t(
-                    "اربط التطبيق بـ Streaming Availability API لاكتشاف الأفلام والمسلسلات ومعرفة أين تُعرض على نتفليكس وديزني+ وغيرها.",
-                    "Connect to the Streaming Availability API to discover titles and see where they stream on Netflix, Disney+, and more."
+                    "أضف رمز TMDB المجاني للبحث في كتالوج عالمي للأفلام والمسلسلات. البيانات والصور فقط؛ الرمز لا يفتح بث الفيديو.",
+                    "Add a free TMDB token to search a worldwide movie and TV catalog. It provides data and artwork only, not video streams."
                 ))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 Link(
-                    model.language.t("التسجيل المجاني للمفتاح", "Get a free API key"),
-                    destination: URL(string: "https://developers.movieofthenight.com/")!
+                    model.language.t("إنشاء الرمز المجاني من TMDB", "Get a free TMDB token"),
+                    destination: URL(string: "https://www.themoviedb.org/settings/api")!
                 )
-            } header: {
-                Text(model.language.t("واجهة البث", "Streaming API"))
-            }
-
-            SwiftUI.Section {
-                SecureField(model.language.t("مفتاح API", "API key"), text: $apiKey)
+                SecureField(model.language.t("API Read Access Token", "API Read Access Token"), text: $tmdbToken)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                Picker(model.language.t("المزود", "Provider"), selection: $provider) {
-                    ForEach(StreamingAPIProvider.allCases) { item in
-                        Text(item.title(model.language)).tag(item)
-                    }
-                }
-                Picker(model.language.t("الدولة", "Country"), selection: $country) {
-                    ForEach(StreamingCountry.supported) { item in
-                        Text(item.name(model.language)).tag(item.code)
-                    }
-                }
+                Text(model.language.t(
+                    "يُحفظ الرمز في Keychain على هذا الجهاز. الاستخدام المجاني مخصص للمشاريع غير التجارية.",
+                    "The token is stored in this device's Keychain. Free use is for non-commercial projects."
+                ))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            } header: {
+                Text("TMDB · API")
             }
 
             SwiftUI.Section {
@@ -57,39 +42,31 @@ struct SettingsView: View {
                     }
                 }
                 Toggle(model.language.t("بانر متحرك في الرئيسية", "Animated home hero"), isOn: $heroCarousel)
-
-                Text(model.language.t("الجهاز: ", "Device: ") + layout.phoneClass.label(model.language))
+                Text(model.language.t("فئة الجهاز: ", "Device size: ") + layout.phoneClass.label(model.language))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } header: {
-                Text(model.language.t("المظهر والمقاس", "Layout"))
+                Text(model.language.t("المظهر والمقاس", "Appearance and layout"))
             }
 
-            SwiftUI.Section {
-                ForEach(StreamingServiceChip.featured) { service in
-                    Toggle(isOn: Binding(
-                        get: { services.contains(service.id) },
-                        set: { on in
-                            if on { services.insert(service.id) } else { services.remove(service.id) }
-                        }
-                    )) {
-                        Text(service.title(model.language))
-                    }
+            SwiftUI.Section(model.language.t("مصادر إضافية", "Additional sources")) {
+                NavigationLink(model.language.t("مصادر الأفلام والمسلسلات", "Movie and series sources")) {
+                    SourceListView()
                 }
-            } header: {
-                Text(model.language.t("خدمات البث المفضلة", "Preferred services"))
+            }
+
+            SwiftUI.Section(model.language.t("نسبة المصدر", "Attribution")) {
+                TMDBAttributionFooter()
+                    .listRowBackground(Color.clear)
             }
 
             SwiftUI.Section {
                 Button(model.language.t("حفظ", "Save")) {
-                    model.updatePreferences(
-                        apiKey: apiKey,
-                        provider: provider,
-                        country: country,
-                        density: density,
-                        heroCarousel: heroCarousel,
-                        services: services
-                    )
+                    model.tmdb.updateAccessToken(tmdbToken)
+                    model.updatePreferences(density: density, heroCarousel: heroCarousel)
+                    if model.tmdb.isConfigured {
+                        model.tmdb.loadTrending(language: model.tmdbLanguage, forceRefresh: true)
+                    }
                     dismiss()
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -101,14 +78,9 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .laylNavigationChrome()
         .onAppear {
-            apiKey = model.apiKey
-            provider = model.apiProvider
-            country = model.streamCountry
+            tmdbToken = model.tmdb.accessToken
             density = model.contentDensity
             heroCarousel = model.heroCarouselEnabled
-            services = model.preferredStreamingServices.isEmpty
-                ? Set(StreamingServiceChip.featured.map(\.id))
-                : model.preferredStreamingServices
         }
     }
 }

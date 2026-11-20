@@ -9,7 +9,7 @@ struct HomeView: View {
     @State private var showSettings = false
     @State private var showGenres = false
     @State private var showCast = false
-    @State private var showDownloads = false
+    @State private var showSavedForLater = false
     @State private var showBell = false
     @State private var homeGenre: Genre?
     @State private var chip: HomeChip = .home
@@ -29,6 +29,9 @@ struct HomeView: View {
                     if !model.myList().isEmpty {
                         myListRail
                     }
+                    if !model.kidsOnly {
+                        tmdbCatalogSection
+                    }
                     if chip == .series {
                         seriesRail
                     } else if chip == .movies {
@@ -44,7 +47,7 @@ struct HomeView: View {
                             MediaRail(lane: lane, posterWidth: layout.posterWidth)
                         }
                     }
-                    sourceRails
+                    if !model.kidsOnly { sourceRails }
                 }
                 .laylHugsWidth()
                 .padding(.bottom, 28)
@@ -56,10 +59,18 @@ struct HomeView: View {
         .toolbar { homeToolbar }
         .toolbarColorScheme(.dark, for: .navigationBar)
         .laylNavigationChrome()
-        .onAppear { model.reloadSourceRails() }
+        .onAppear {
+            if !model.kidsOnly {
+                model.reloadSourceRails()
+                model.tmdb.loadTrending(language: model.tmdbLanguage)
+            }
+        }
+        .onChange(of: model.tmdbLanguage) { _, language in
+            model.tmdb.loadTrending(language: language, forceRefresh: true)
+        }
         .sheet(isPresented: $showGenres) { genreSheet }
         .sheet(isPresented: $showCast) { castSheet }
-        .sheet(isPresented: $showDownloads) { downloadSheet }
+        .sheet(isPresented: $showSavedForLater) { savedForLaterSheet }
         .sheet(isPresented: $showBell) { bellSheet }
         .onReceive(Timer.publish(every: 8, on: .main, in: .common).autoconnect()) { _ in
             guard model.heroCarouselEnabled, featured.count > 1 else { return }
@@ -69,6 +80,12 @@ struct HomeView: View {
         }
         .onChange(of: model.activeProfileID) { _, _ in
             featuredIndex = 0
+            if !model.kidsOnly {
+                model.reloadSourceRails()
+                model.tmdb.loadTrending(language: model.tmdbLanguage)
+            } else {
+                model.sourceRails = []
+            }
         }
         .navigationDestination(isPresented: $showLicenses) {
             LicensesView()
@@ -137,8 +154,8 @@ struct HomeView: View {
         ToolbarItemGroup(placement: .topBarTrailing) {
             Button { showCast = true } label: { Image(systemName: "airplayvideo") }
                 .accessibilityLabel(model.language.t("البث", "Cast"))
-            Button { showDownloads = true } label: { Image(systemName: "arrow.down.to.line") }
-                .accessibilityLabel(model.language.t("التنزيلات", "Downloads"))
+            Button { showSavedForLater = true } label: { Image(systemName: "bookmark") }
+                .accessibilityLabel(model.language.t("محفوظ للمشاهدة لاحقًا", "Saved for later"))
             Button { showBell = true } label: { Image(systemName: "bell") }
                 .accessibilityLabel(model.language.t("جديد", "New"))
         }
@@ -229,6 +246,60 @@ struct HomeView: View {
             lane: Lane(id: "series-home", title: L10n(ar: "مسلسلات", en: "Series"), titleIDs: ids, style: .poster),
             posterWidth: layout.posterWidth
         )
+    }
+
+    private var tmdbCatalogSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(model.language.t("اكتشف أعمالًا من العالم", "Discover titles worldwide"))
+                        .font(.title3.weight(.bold))
+                    Text(model.language.t("بيانات وصور من TMDB · لا تشمل تشغيل الفيديو", "TMDB metadata and artwork · not video playback"))
+                        .font(.caption2)
+                        .foregroundStyle(LaylTheme.muted)
+                }
+                Spacer(minLength: 8)
+                NavigationLink { DiscoverView() } label: {
+                    Text(model.language.t("الكل", "Explore"))
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white)
+                }
+            }
+            .padding(.horizontal, sideInset)
+
+            if !model.tmdb.isConfigured {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(model.language.t("الكتالوج العالمي يحتاج رمز TMDB مجانيًا", "The global catalog needs a free TMDB token"))
+                        .font(.subheadline.weight(.semibold))
+                    NavigationLink { SettingsView() } label: {
+                        Label(model.language.t("إعداد TMDB", "Set up TMDB"), systemImage: "key.fill")
+                            .font(.caption.weight(.bold))
+                    }
+                }
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(LaylTheme.elevated, in: RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal, sideInset)
+            } else if model.tmdb.isLoading && model.tmdb.trending.isEmpty {
+                ProgressView(model.language.t("نجلب الرائج عالميًا...", "Loading worldwide trends..."))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 24)
+            } else if !model.tmdb.trending.isEmpty {
+                TMDBRail(
+                    title: model.language.t("الرائج عالميًا", "Trending worldwide"),
+                    items: model.tmdb.trending,
+                    posterWidth: layout.posterWidth
+                )
+                TMDBAttributionFooter()
+                    .padding(.horizontal, sideInset)
+            } else if let error = model.tmdb.error {
+                Text(error)
+                    .font(.footnote)
+                    .foregroundStyle(LaylTheme.muted)
+                    .padding(.horizontal, sideInset)
+            }
+        }
+        .laylHugsWidth()
     }
 
     private var moviesRail: some View {
@@ -398,23 +469,23 @@ struct HomeView: View {
         .laylGlassSheet()
     }
 
-    private var downloadSheet: some View {
+    private var savedForLaterSheet: some View {
         NavigationStack {
-            List(model.downloads, id: \.self) { id in
+            List(model.savedForLater, id: \.self) { id in
                 if let title = Catalog.title(id: id) {
                     Button(title.title.text(model.language)) { model.detailTitle = title }
                         .foregroundStyle(.white)
                 }
             }
             .overlay {
-                if model.downloads.isEmpty {
-                    Text(model.language.t("لا توجد تنزيلات بعد.", "Nothing saved for later yet."))
+                if model.savedForLater.isEmpty {
+                    Text(model.language.t("لا توجد أعمال محفوظة بعد.", "Nothing saved for later yet."))
                         .foregroundStyle(.secondary)
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Color.black)
-            .navigationTitle(model.language.t("التنزيلات", "Downloads"))
+            .navigationTitle(model.language.t("للمشاهدة لاحقًا", "Saved for later"))
             .laylNavigationChrome()
         }
         .presentationDetents([.medium, .large])

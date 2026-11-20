@@ -53,12 +53,6 @@ struct MainShell: View {
             }
             .laylGlassSheet()
         }
-        .sheet(item: Binding(get: { model.detailShow }, set: { model.detailShow = $0 })) { show in
-            NavigationStack {
-                StreamingShowDetailView(show: show)
-            }
-            .laylGlassSheet()
-        }
         .fullScreenCover(
             item: Binding(get: { model.remotePlay }, set: { model.remotePlay = $0 })
         ) { playback in

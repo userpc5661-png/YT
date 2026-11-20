@@ -11,7 +11,6 @@ struct TitleDetailView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @Environment(\.laylLayout) private var layout
-    @Environment(\.openURL) private var openURL
     @State private var pane: DetailPane = .episodes
     @State private var expanded = false
     @State private var showRate = false
@@ -42,10 +41,10 @@ struct TitleDetailView: View {
                             .background(.white, in: RoundedRectangle(cornerRadius: 8))
                     }
                     .buttonStyle(.plain)
-                    Button { model.toggleDownload(title.id) } label: {
+                    Button { model.toggleSavedForLater(title.id) } label: {
                         Label(
-                            model.isDownloaded(title.id) ? language.t("محفوظ على الجهاز", "Saved on this device") : language.t("تنزيل", "Download"),
-                            systemImage: "arrow.down.to.line"
+                            model.isSavedForLater(title.id) ? language.t("محفوظ للمشاهدة لاحقًا", "Saved for later") : language.t("حفظ للمشاهدة لاحقًا", "Save for later"),
+                            systemImage: "bookmark"
                         )
                         .font(.headline.weight(.semibold))
                         .frame(maxWidth: .infinity)
@@ -64,7 +63,6 @@ struct TitleDetailView: View {
                     actionRow
                     panePicker
                     paneBody
-                    if model.hasStreamingAPI { streamingAvailability }
                     rights
                 }
                 .padding(.horizontal, layout.contentInset)
@@ -81,7 +79,6 @@ struct TitleDetailView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden(true)
-        .onAppear { model.loadStreamingInfo(for: title) }
         .popover(isPresented: $showRate) {
             ratePopover
                 .presentationCompactAdaptation(.popover)
@@ -124,9 +121,6 @@ struct TitleDetailView: View {
                 .frame(maxWidth: .infinity)
             }
             .buttonStyle(.plain)
-            actionButton(language.t("تنزيل الموسم", "Download season"), "arrow.down.to.line") {
-                model.toggleDownload(title.id)
-            }
         }
         .foregroundStyle(.white)
     }
@@ -273,39 +267,6 @@ struct TitleDetailView: View {
             }
             .padding(.horizontal, layout.contentInset)
             .padding(.top, 12)
-        }
-    }
-
-    private var streamingAvailability: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(model.language.t("أين يُعرض (API)", "Where to stream (API)"))
-                .font(.title3.weight(.bold))
-            if let show = model.titleStreamingInfo[title.id] {
-                if show.streamingOptions.isEmpty {
-                    Text(model.language.t("لا توجد روابط في دولتك المختارة.", "No links in your selected country."))
-                        .font(.footnote)
-                        .foregroundStyle(LaylTheme.muted)
-                } else {
-                    ForEach(show.streamingOptions.prefix(6)) { option in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(option.serviceName).font(.subheadline.weight(.semibold))
-                                Text(option.type).font(.caption).foregroundStyle(LaylTheme.muted)
-                            }
-                            Spacer()
-                            if let link = option.link {
-                                Button(model.language.t("فتح", "Open")) { openURL(link) }
-                                    .font(.caption.weight(.bold))
-                            }
-                        }
-                        .padding(10)
-                        .background(LaylTheme.elevated, in: RoundedRectangle(cornerRadius: 10))
-                    }
-                }
-                APIAttributionFooter()
-            } else {
-                ProgressView()
-            }
         }
     }
 

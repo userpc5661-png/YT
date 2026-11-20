@@ -26,8 +26,8 @@ struct AccountView: View {
                 NavigationLink(model.language.t("مصادر الأفلام والمسلسلات", "Movie and series sources")) {
                     SourceListView()
                 }
-                NavigationLink("FaselHD") {
-                    FaselView()
+                NavigationLink(model.language.t("اكتشف عالميًا", "Worldwide catalog")) {
+                    DiscoverView()
                 }
                 NavigationLink(model.language.t("الإعدادات", "Settings")) {
                     SettingsView()
@@ -60,19 +60,13 @@ struct SourceListView: View {
         List {
             SwiftUI.Section {
                 Text(model.language.t(
-                    "أضف واجهة عامة: العنوان، المسارات، والمفتاح يُحفظ في سلسلة المفاتيح. القوالب الجاهزة لبيانات TMDB وStreaming Availability فقط.",
-                    "Add a generic API: base URL, paths, and a key kept in the Keychain. Built-in presets are TMDB metadata and Streaming Availability only."
+                    "أضف مصدر بيانات HTTPS مخصصًا. رمز كل مصدر يُحفظ في سلسلة المفاتيح. يتوفر كتالوج TMDB العالمي من الصفحة السابقة.",
+                    "Add a custom HTTPS data source. Each source token is stored in the Keychain. The built-in worldwide TMDB catalog is available on the previous screen."
                 ))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             }
             SwiftUI.Section {
-                Button(model.language.t("قالب TMDB", "TMDB preset")) {
-                    editor = SourcePresets.tmdb()
-                }
-                Button(model.language.t("قالب توفر البث", "Streaming Availability preset")) {
-                    editor = SourcePresets.streamingAvailability()
-                }
                 Button(model.language.t("مصدر فارغ", "Blank source")) {
                     editor = ContentSource(
                         id: UUID(),
@@ -226,11 +220,8 @@ struct SourceEditorView: View {
         let draft = source
         let typed = secret
         Task {
-            if !typed.isEmpty {
-                KeychainStore.set(typed, account: draft.id.uuidString)
-            }
             do {
-                let items = try await SourceClient.load(draft, feed: .movies)
+                let items = try await SourceClient.load(draft, feed: .movies, secret: typed)
                 await MainActor.run {
                     preview = items
                     testing = false

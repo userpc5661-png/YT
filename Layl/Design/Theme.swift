@@ -33,8 +33,8 @@ extension View {
         .navigationDestination(for: Lane.self) { lane in
             LaneGridView(lane: lane)
         }
-        .navigationDestination(for: StreamingShow.self) { show in
-            StreamingShowDetailView(show: show)
+        .navigationDestination(for: TMDBTitle.self) { title in
+            TMDBDetailView(title: title)
         }
         .navigationDestination(for: RemoteTitle.self) { title in
             RemoteDetailView(title: title)

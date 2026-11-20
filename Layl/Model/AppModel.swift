@@ -7,21 +7,9 @@ final class AppModel {
     var profiles: [Profile]
     var activeProfileID: String?
     var playRequest: PlayRequest?
-
-    // Streaming Availability API — https://github.com/movieofthenight/streaming-availability-api
-    var apiKey: String
-    var apiProvider: StreamingAPIProvider
-    var streamCountry: String
+    let tmdb = TMDBCatalogModel()
     var contentDensity: ContentDensity
     var heroCarouselEnabled: Bool
-    var preferredStreamingServices: Set<String>
-
-    var discoverLanes: [DiscoverLane] = []
-    var discoverLoading = false
-    var discoverError: String?
-    var streamingSearchResults: [StreamingShow] = []
-    var streamingSearchLoading = false
-    var titleStreamingInfo: [String: StreamingShow] = [:]
     var sources: [ContentSource] = []
     var sourceRails: [SourceRail] = []
     var sourceSearch: [RemoteTitle] = []
@@ -29,18 +17,16 @@ final class AppModel {
     var remotePlay: RemotePlayback?
     var detailTitle: CatalogTitle?
     var detailRemote: RemoteTitle?
-    var detailShow: StreamingShow?
     var tastes: [String: String] = [:]
-    var downloads: [String] = []
+    var savedForLater: [String] = []
 
     private var lists: [String: [String]]
     private var progress: [String: [String: WatchProgress]]
     private var lastDiskWrite = Date.distantPast
     private let storageKey = "layl.state.v2"
-    private let api = StreamingAvailabilityAPI()
-    private var searchTask: Task<Void, Never>?
 
     init() {
+        Self.eraseLegacyAPIKeys()
         if let data = UserDefaults.standard.data(forKey: storageKey),
            let saved = try? JSONDecoder().decode(SavedState.self, from: data),
            !saved.profiles.isEmpty {
@@ -48,12 +34,8 @@ final class AppModel {
             profiles = saved.profiles
             lists = saved.lists
             progress = saved.progress
-            apiKey = saved.apiKey
-            apiProvider = saved.apiProvider
-            streamCountry = saved.streamCountry
             contentDensity = saved.contentDensity
             heroCarouselEnabled = saved.heroCarouselEnabled
-            preferredStreamingServices = Set(saved.preferredStreamingServices)
         } else if let legacy = UserDefaults.standard.data(forKey: "layl.state.v1"),
                   let saved = try? JSONDecoder().decode(LegacySavedState.self, from: legacy),
                   !saved.profiles.isEmpty {
@@ -61,27 +43,19 @@ final class AppModel {
             profiles = saved.profiles
             lists = saved.lists
             progress = saved.progress
-            apiKey = ""
-            apiProvider = .movieOfTheNight
-            streamCountry = "sa"
             contentDensity = .comfortable
             heroCarouselEnabled = true
-            preferredStreamingServices = Set(StreamingServiceChip.featured.map(\.id))
         } else {
             language = .arabic
             profiles = Profile.defaults
             lists = [:]
             progress = [:]
-            apiKey = ""
-            apiProvider = .movieOfTheNight
-            streamCountry = "sa"
             contentDensity = .comfortable
             heroCarouselEnabled = true
-            preferredStreamingServices = Set(StreamingServiceChip.featured.map(\.id))
         }
         loadSources()
         tastes = UserDefaults.standard.dictionary(forKey: "layl.tastes.v1") as? [String: String] ?? [:]
-        downloads = UserDefaults.standard.stringArray(forKey: "layl.downloads.v1") ?? []
+        savedForLater = UserDefaults.standard.stringArray(forKey: "layl.downloads.v1") ?? []
     }
 
     func tasteKey(_ titleID: String) -> String {
@@ -97,17 +71,17 @@ final class AppModel {
         UserDefaults.standard.set(tastes, forKey: "layl.tastes.v1")
     }
 
-    func isDownloaded(_ titleID: String) -> Bool {
-        downloads.contains(titleID)
+    func isSavedForLater(_ titleID: String) -> Bool {
+        savedForLater.contains(titleID)
     }
 
-    func toggleDownload(_ titleID: String) {
-        if let index = downloads.firstIndex(of: titleID) {
-            downloads.remove(at: index)
+    func toggleSavedForLater(_ titleID: String) {
+        if let index = savedForLater.firstIndex(of: titleID) {
+            savedForLater.remove(at: index)
         } else {
-            downloads.insert(titleID, at: 0)
+            savedForLater.insert(titleID, at: 0)
         }
-        UserDefaults.standard.set(downloads, forKey: "layl.downloads.v1")
+        UserDefaults.standard.set(savedForLater, forKey: "layl.downloads.v1")
     }
 
     func loadSources() {
@@ -194,153 +168,15 @@ final class AppModel {
         remotePlay = RemotePlayback(url: url, title: title.title)
     }
 
-    var hasStreamingAPI: Bool {
-        !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    var outputLanguage: String { language == .arabic ? "ar" : "en" }
+    var tmdbLanguage: String { language == .arabic ? "ar-SA" : "en-US" }
 
     func updatePreferences(
-        apiKey: String,
-        provider: StreamingAPIProvider,
-        country: String,
         density: ContentDensity,
-        heroCarousel: Bool,
-        services: Set<String>
+        heroCarousel: Bool
     ) {
-        self.apiKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        apiProvider = provider
-        streamCountry = country
         contentDensity = density
         heroCarouselEnabled = heroCarousel
-        preferredStreamingServices = services
         persist()
-        discoverLanes = []
-        discoverError = nil
-    }
-
-    func loadDiscoverCatalog() {
-        guard hasStreamingAPI else {
-            discoverError = language.t("أضف مفتاح API من الإعدادات.", "Add an API key in Settings.")
-            return
-        }
-        guard !discoverLoading else { return }
-        discoverLoading = true
-        discoverError = nil
-        let country = streamCountry
-        let key = apiKey
-        let provider = apiProvider
-        let lang = outputLanguage
-        let services = preferredStreamingServices.isEmpty
-            ? StreamingServiceChip.featured.map(\.id)
-            : Array(preferredStreamingServices)
-        Task { @MainActor in
-            defer { discoverLoading = false }
-            var lanes: [DiscoverLane] = []
-            for service in services.prefix(4) {
-                if let chip = StreamingServiceChip.featured.first(where: { $0.id == service }) {
-                    do {
-                        let shows = try await api.topShows(
-                            country: country,
-                            service: service,
-                            showType: nil,
-                            provider: provider,
-                            apiKey: key,
-                            outputLanguage: lang
-                        )
-                        if !shows.isEmpty {
-                            lanes.append(
-                                DiscoverLane(
-                                    id: "top-\(service)",
-                                    title: L10n(ar: "الأكثر على \(chip.titleAR)", en: "Top on \(chip.titleEN)"),
-                                    shows: shows
-                                )
-                            )
-                        }
-                    } catch {
-                        discoverError = error.localizedDescription
-                    }
-                }
-            }
-            discoverLanes = lanes
-            if lanes.isEmpty, discoverError == nil {
-                discoverError = language.t("لا توجد قوائم لهذه الخدمة/الدولة.", "No lists for this service or country.")
-            }
-        }
-    }
-
-    func searchStreaming(query: String) {
-        searchTask?.cancel()
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.count >= 2, hasStreamingAPI else {
-            streamingSearchResults = []
-            streamingSearchLoading = false
-            return
-        }
-        streamingSearchLoading = true
-        let country = streamCountry
-        let key = apiKey
-        let provider = apiProvider
-        let lang = outputLanguage
-        searchTask = Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 350_000_000)
-            guard !Task.isCancelled else { return }
-            do {
-                let shows = try await api.searchByTitle(
-                    title: trimmed,
-                    country: country,
-                    showType: nil,
-                    provider: provider,
-                    apiKey: key,
-                    outputLanguage: lang
-                )
-                streamingSearchResults = shows
-            } catch {
-                streamingSearchResults = []
-            }
-            streamingSearchLoading = false
-        }
-    }
-
-    func loadStreamingInfo(for title: CatalogTitle) {
-        guard hasStreamingAPI else { return }
-        guard titleStreamingInfo[title.id] == nil else { return }
-        let country = streamCountry
-        let key = apiKey
-        let provider = apiProvider
-        let lang = outputLanguage
-        Task { @MainActor in
-            do {
-                let show: StreamingShow
-                if let imdb = title.externalImdb {
-                    show = try await api.show(id: imdb, country: country, provider: provider, apiKey: key, outputLanguage: lang)
-                } else {
-                    let matches = try await api.searchByTitle(
-                        title: title.title.en,
-                        country: country,
-                        showType: title.kind,
-                        provider: provider,
-                        apiKey: key,
-                        outputLanguage: lang
-                    )
-                    guard let first = matches.first else { return }
-                    show = first
-                }
-                titleStreamingInfo[title.id] = show
-            } catch {
-                return
-            }
-        }
-    }
-
-    func catalogMatch(for show: StreamingShow) -> CatalogTitle? {
-        if let byImdb = Catalog.all.first(where: { $0.externalImdb == show.imdbId }) {
-            return byImdb
-        }
-        let folded = show.title.folded
-        return Catalog.all.first {
-            $0.title.en.folded == folded || $0.title.ar.folded == folded
-        }
     }
 
     var activeProfile: Profile? {
@@ -477,12 +313,8 @@ final class AppModel {
             profiles: profiles,
             lists: lists,
             progress: progress,
-            apiKey: apiKey,
-            apiProvider: apiProvider,
-            streamCountry: streamCountry,
             contentDensity: contentDensity,
-            heroCarouselEnabled: heroCarouselEnabled,
-            preferredStreamingServices: Array(preferredStreamingServices)
+            heroCarouselEnabled: heroCarouselEnabled
         )
         if let data = try? JSONEncoder().encode(saved) {
             UserDefaults.standard.set(data, forKey: storageKey)
@@ -494,12 +326,8 @@ final class AppModel {
         var profiles: [Profile]
         var lists: [String: [String]]
         var progress: [String: [String: WatchProgress]]
-        var apiKey: String
-        var apiProvider: StreamingAPIProvider
-        var streamCountry: String
         var contentDensity: ContentDensity
         var heroCarouselEnabled: Bool
-        var preferredStreamingServices: [String]
     }
 
     private struct LegacySavedState: Codable {
@@ -507,5 +335,16 @@ final class AppModel {
         var profiles: [Profile]
         var lists: [String: [String]]
         var progress: [String: [String: WatchProgress]]
+    }
+
+    private static func eraseLegacyAPIKeys() {
+        for key in ["layl.state.v1", "layl.state.v2"] {
+            guard let data = UserDefaults.standard.data(forKey: key),
+                  var saved = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  saved.removeValue(forKey: "apiKey") != nil,
+                  let cleaned = try? JSONSerialization.data(withJSONObject: saved) else { continue }
+            UserDefaults.standard.set(cleaned, forKey: key)
+        }
+        UserDefaults.standard.removeObject(forKey: "fasel.host")
     }
 }
