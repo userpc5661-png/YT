@@ -52,6 +52,11 @@ class Resolver:
             future = asyncio.run_coroutine_threadsafe(self._resolve(episode_url), self._loop)
             return future.result(timeout)
 
+    def warmup(self):
+        """launch Chromium ahead of the first request"""
+        future = asyncio.run_coroutine_threadsafe(self._ensure_browser(), self._loop)
+        future.add_done_callback(lambda f: f.exception())
+
     def close(self):
         async def shutdown():
             if self._browser is not None:
@@ -105,6 +110,8 @@ class Resolver:
                     collected.append(url)
 
             page.on("request", on_request)
+            # movie pages open the player in a popup; catch its requests too
+            context.on("request", on_request)
 
             try:
                 await page.goto(episode_url, wait_until="domcontentloaded", timeout=25000)
@@ -136,10 +143,26 @@ class Resolver:
                     break
                 await asyncio.sleep(1)
 
+            # movie player pages list servers in a popup — click into them
+            if not collected and len(context.pages) > 1:
+                for popup in context.pages[1:]:
+                    for selector in SELECTORS:
+                        try:
+                            element = await popup.query_selector(selector)
+                            if element is not None:
+                                await element.click(timeout=2000, force=True)
+                                break
+                        except Exception:
+                            continue
+                for _ in range(8):
+                    if collected:
+                        break
+                    await asyncio.sleep(1)
+
             if not collected:
                 try:
                     await page.mouse.click(640, 360)
-                    for _ in range(8):
+                    for _ in range(6):
                         if collected:
                             break
                         await asyncio.sleep(1)

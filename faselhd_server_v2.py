@@ -293,8 +293,18 @@ def ui():
 
 if __name__ == "__main__":
     import socket
-    hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
+
+    def default_ip():
+        probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            probe.connect(("8.8.8.8", 80))
+            return probe.getsockname()[0]
+        except Exception:
+            return "127.0.0.1"
+        finally:
+            probe.close()
+
+    _resolver.warmup()
     print(f"[*] http://localhost:8080/ui")
-    print(f"[*] iPhone: http://{local_ip}:8080/catalog/layl")
+    print(f"[*] iPhone: http://{default_ip()}:8080/catalog/layl")
     app.run(host="0.0.0.0", port=8080, debug=False, threaded=True)
