@@ -1,5 +1,6 @@
 # faselhd_server_v2.py
-# pip install flask
+# pip install flask requests playwright
+# python -m playwright install chromium
 # python faselhd_server_v2.py
 
 import json, re, os, time, threading
@@ -296,6 +297,7 @@ def debug_stream():
         "url": url,
         "master": data.get("master"),
         "streams": data.get("streams"),
+        "players": data.get("players"),
         "all": data.get("all"),
     })
 
